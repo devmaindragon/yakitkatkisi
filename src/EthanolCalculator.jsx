@@ -1,5 +1,5 @@
 import React, { useState, useMemo, createContext, useContext } from "react";
-import { Fuel, Droplet, Target, Check, AlertTriangle, Beaker, Gauge, Flame } from "lucide-react";
+import { Fuel, Droplet, Target, Check, AlertTriangle, Beaker, Gauge, Flame, Grid2x2 } from "lucide-react";
 
 /* ============================================================
    HESAP ÇEKİRDEĞİ — platformdan bağımsız, saf fonksiyonlar.
@@ -17,6 +17,10 @@ export const OCTANES = [93, 95, 98, 100];
 
 export const AUTHOR = "dev.main.dragon";
 export const SHOW_AD = true;   // false yaparsan banner alanı tamamen kapanır
+
+export const APPS = [
+  { id: "power", name: { tr: "Güç Hesaplama", en: "Power Calculator", es: "Cálculo de Potencia" }, url: null },
+];
 
 export const CARS = [
   { name: "BMW G20 320i", liters: 60 },
@@ -120,6 +124,7 @@ const STR = {
     dilute: "Hedef mevcut oranın altında. Benzin ekleyerek seyreltmen gerekir.",
     atTarget: "Karışım zaten hedefte. Ekleme gerekmiyor.",
     tolWarn: "%30 üzeri toluen contalara ve yakıt hortumlarına zarar verebilir, soğuk çalıştırmayı zorlaştırır.",
+    appsBtn: "Diğer uygulamalar", appsTitle: "Diğer Uygulamalar", soon: "Çok yakında", appsHint: "Yeni araçlar üzerinde çalışıyoruz.",
     modalTitle: "Depo Hacimleri", modalHint: "Seçince depo hacmi alana yazılır.",
     close: "Kapat",
   },
@@ -138,6 +143,7 @@ const STR = {
     dilute: "Target is below the current ratio. You need to dilute with gasoline.",
     atTarget: "The blend is already on target. Nothing to add.",
     tolWarn: "Above 30% toluene can damage seals and fuel lines, and makes cold starts harder.",
+    appsBtn: "Other apps", appsTitle: "Other Apps", soon: "Coming soon", appsHint: "More tools are on the way.",
     modalTitle: "Tank Sizes", modalHint: "Tap one to fill in the tank field.",
     close: "Close",
   },
@@ -156,6 +162,7 @@ const STR = {
     dilute: "El objetivo está por debajo del nivel actual. Hay que diluir con gasolina.",
     atTarget: "La mezcla ya está en el objetivo. No hace falta añadir nada.",
     tolWarn: "Por encima del 30%, el tolueno puede dañar juntas y latiguillos, y dificulta el arranque en frío.",
+    appsBtn: "Otras apps", appsTitle: "Otras Apps", soon: "Muy pronto", appsHint: "Estamos preparando más herramientas.",
     modalTitle: "Capacidad del Depósito", modalHint: "Toca una para rellenar el campo.",
     close: "Cerrar",
   },
@@ -176,7 +183,7 @@ const THEME = {
   presetBg: "#181e25", presetOn: "#d0202c", presetOnText: "#ffffff",
   danger: "#f0b429", dangerBg: "#241c10",
   radius: 3, cardRadius: 6, outline: true,
-  numFont: MONO, upper: true, track: 3, thumbRadius: "3px", gap: 7,
+  numFont: MONO, upper: true, track: 3, thumbRadius: "3px", gap: 6,
 };
 
 export const VERSION =
@@ -205,7 +212,7 @@ function Card({ children, accent, active, style }) {
   const t = useT();
   return (
     <div style={{
-      background: t.card, borderRadius: t.cardRadius, padding: 13,
+      background: t.card, borderRadius: t.cardRadius, padding: 11,
       border: `1px solid ${active ? accent : t.outline ? t.line : "transparent"}`,
       ...style,
     }}>{children}</div>
@@ -284,17 +291,18 @@ function NumberField({ value, unit, onChange, min, max }) {
   );
 }
 
-function Row({ icon: Icon, label, value, unit, color, ...s }) {
+function Row({ icon: Icon, label, value, unit, color, action, ...s }) {
   const t = useT();
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 11 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
         <Icon size={17} color={color} strokeWidth={2.2} />
         <span style={{
-          fontSize: t.upper ? 12 : 15, fontWeight: 600, flex: 1,
+          fontSize: t.upper ? 12 : 15, fontWeight: 600,
           textTransform: t.upper ? "uppercase" : "none",
           letterSpacing: t.upper ? "0.09em" : 0,
         }}>{label}</span>
+        <span style={{ flex: 1, minWidth: 4 }}>{action}</span>
         <NumberField value={value} unit={unit} onChange={s.onChange} min={s.min} max={s.max} />
       </div>
       <Slider {...s} value={value} color={color} />
@@ -339,6 +347,37 @@ function AdSlot() {
   );
 }
 
+function Modal({ title, hint, onClose, closeLabel, children }) {
+  const t = useT();
+  return (
+    <div onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 50, padding: 20,
+        background: "rgba(0,0,0,.78)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+      }}>
+      <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}
+        style={{
+          background: t.card, border: `1px solid ${t.line}`,
+          borderRadius: t.cardRadius, padding: 18,
+          width: "100%", maxWidth: 360,
+        }}>
+        <div style={{ marginBottom: 4 }}><Cap>{title}</Cap></div>
+        <p style={{ color: t.dim, fontSize: 12, margin: "0 0 14px", lineHeight: 1.5 }}>{hint}</p>
+        {children}
+        <button onClick={onClose}
+          style={{
+            width: "100%", marginTop: 8, padding: "12px 0",
+            background: "transparent", color: t.dim,
+            border: `1px solid ${t.line}`, borderRadius: t.radius,
+            fontSize: 12, fontWeight: 700, fontFamily: MONO,
+            textTransform: "uppercase", letterSpacing: ".1em", cursor: "pointer",
+          }}>{closeLabel}</button>
+      </div>
+    </div>
+  );
+}
+
 /* ============================================================
    UYGULAMA
    ============================================================ */
@@ -348,11 +387,12 @@ export default function FuelAdditiveCalculator() {
   const [additiveId, setAdditiveId] = useState("ethanol");
   const [octane, setOctane] = useState(95);
   const [customRon, setCustomRon] = useState(110);
-  const [tank, setTank] = useState(20);
+  const [tank, setTank] = useState(0);
   const [currentPct, setCurrentPct] = useState(0);
   const [targetPct, setTargetPct] = useState(20);
   const [addVolume, setAddVolume] = useState(5);
   const [showTanks, setShowTanks] = useState(false);
+  const [showApps, setShowApps] = useState(false);
   const [lang, setLang] = useState("tr");
 
   const t = THEME;
@@ -395,8 +435,8 @@ export default function FuelAdditiveCalculator() {
   return (
     <ThemeCtx.Provider value={t}>
       <div style={{
-        background: t.bg, color: t.text, minHeight: "100%",
-        padding: "calc(34px + env(safe-area-inset-top, 0px)) 13px calc(28px + env(safe-area-inset-bottom, 0px))", fontFamily: SANS,
+        background: t.bg, color: t.text, minHeight: "100vh",
+        padding: "calc(16px + env(safe-area-inset-top, 0px)) 12px calc(18px + env(safe-area-inset-bottom, 0px))", fontFamily: SANS,
         fontVariantNumeric: "tabular-nums", WebkitTapHighlightColor: "transparent",
         maxWidth: 520, margin: "0 auto",
       }}>
@@ -410,14 +450,19 @@ export default function FuelAdditiveCalculator() {
           @media (prefers-reduced-motion:no-preference){.ec-bar span{transition:flex-grow .25s ease;}}
         `}</style>
 
-        <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap", rowGap: 8 }}>
+        {/* Tüm görünümü kaplayan zemin — WebView'ın beyaz arkaplanını gizler */}
+        <div style={{ position: "fixed", inset: 0, background: t.bg, zIndex: -1 }} />
+
+        <AdSlot />
+
+        <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9, flexWrap: "wrap", rowGap: 6 }}>
           <Flame size={19} color={t.add} strokeWidth={2.2} />
           <h1 style={{
             fontSize: t.upper ? 15 : 22, fontWeight: 800, margin: 0, whiteSpace: "nowrap",
             letterSpacing: t.upper ? "0.1em" : -0.7,
             fontFamily: t.upper ? MONO : SANS,
           }}>{L.title}</h1>
-          <button onClick={() => setShowTanks(true)}
+          <button onClick={() => setShowApps(true)}
             style={{
               marginLeft: "auto", cursor: "pointer",
               background: "transparent", color: t.dim,
@@ -426,7 +471,7 @@ export default function FuelAdditiveCalculator() {
               textTransform: "uppercase", letterSpacing: ".06em", whiteSpace: "nowrap",
               display: "flex", alignItems: "center", gap: 4,
             }}>
-            <Fuel size={11} strokeWidth={2.4} /> {L.tankBtn}
+            <Grid2x2 size={11} strokeWidth={2.4} /> {L.appsBtn}
           </button>
           <button
             onClick={() => setLang(LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length])}
@@ -438,8 +483,6 @@ export default function FuelAdditiveCalculator() {
               textTransform: "uppercase", letterSpacing: ".06em",
             }}>{lang}</button>
         </header>
-
-        <AdSlot />
 
         {/* Kurulum: katkı türü + oktan */}
         <Card style={{ marginBottom: t.gap }}>
@@ -457,7 +500,7 @@ export default function FuelAdditiveCalculator() {
             </div>
           ) : null}
 
-          <div style={{ margin: "13px 0 6px" }}><Cap>{L.baseOctane}</Cap></div>
+          <div style={{ margin: "10px 0 5px" }}><Cap>{L.baseOctane}</Cap></div>
           <Segmented value={octane} onChange={setOctane}
             options={OCTANES.map((o) => ({ value: o, label: String(o) }))} />
         </Card>
@@ -489,7 +532,16 @@ export default function FuelAdditiveCalculator() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: t.gap }}>
           <Card>
-            <Row icon={Fuel} label={L.tankLabel} value={tank} unit="L" color={t.cur}
+            <Row icon={Fuel} label={L.tankLabel} value={tank}
+              action={
+                <button onClick={() => setShowTanks(true)}
+                  style={{
+                    background: "transparent", border: "none", padding: "2px 4px",
+                    color: t.dim, cursor: "pointer", fontFamily: MONO, fontSize: 9,
+                    fontWeight: 600, textTransform: "uppercase", letterSpacing: ".06em",
+                    textDecoration: "underline", textUnderlineOffset: 3, whiteSpace: "nowrap",
+                  }}>{L.tankBtn}</button>
+              } unit="L" color={t.cur}
               min={0} max={120} step={0.5} onChange={setTank} />
           </Card>
 
@@ -502,7 +554,7 @@ export default function FuelAdditiveCalculator() {
             <Card accent={t.add} active={addVolume > 0}>
               <Row icon={Beaker} label={L.toAdd(A.name)} value={addVolume} unit="L" color={t.add}
                 min={0} max={addMax} step={0.1} onChange={setAddVolume} />
-              <div style={{ marginTop: 10 }}>
+              <div style={{ marginTop: 8 }}>
                 <Segmented value={addVolume} onChange={setAddVolume}
                   options={[0.5, 1, 2.5, 5, 10].map((v) => ({
                     value: v, label: `${String(v).replace(".", DEC)} L`,
@@ -513,7 +565,7 @@ export default function FuelAdditiveCalculator() {
             <Card accent={t.add} active={targetPct !== currentPct}>
               <Row icon={Target} label={L.target(A.name)} value={targetPct} unit="%" color={t.add}
                 min={0} max={100} step={1} onChange={setTargetPct} />
-              <div style={{ marginTop: 10 }}>
+              <div style={{ marginTop: 8 }}>
                 <Segmented value={targetPct} onChange={setTargetPct}
                   options={A.presets.map((p) => ({ value: p, label: PCTPRE ? `%${p}` : `${p}%` }))} />
               </div>
@@ -521,9 +573,9 @@ export default function FuelAdditiveCalculator() {
           )}
 
           {/* SONUÇ */}
-          <Card style={{ padding: 15 }} accent={t.add}
+          <Card style={{ padding: 12 }} accent={t.add}
             active={!r.blocked && r.mode !== "empty"}>
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 9 }}>
               {r.blocked ? <AlertTriangle size={17} color={t.danger} />
                 : <Check size={17} color={t.add} strokeWidth={3} />}
               <span style={{
@@ -557,12 +609,12 @@ export default function FuelAdditiveCalculator() {
                   display: "flex", gap: t.id === "amount" ? 2 : 0,
                   height: t.id === "amount" ? 7 : 11,
                   borderRadius: t.id === "amount" ? 1 : 99,
-                  overflow: "hidden", marginTop: 14,
+                  overflow: "hidden", marginTop: 11,
                   background: t.id === "amount" ? "transparent" : t.line,
                 }}>
                   {segs.map((s, i) => <span key={i} style={{ flexGrow: s.v, background: s.c }} />)}
                 </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 10 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 8 }}>
                   {segs.map((s, i) => (
                     <span key={i} style={{ display: "flex", alignItems: "center", gap: 5 }}>
                       <span style={{ width: 8, height: 8, borderRadius: t.id === "amount" ? 0 : 2, background: s.c }} />
@@ -574,7 +626,7 @@ export default function FuelAdditiveCalculator() {
                 {/* Oktan */}
                 <div style={{
                   display: "flex", alignItems: "center", gap: 12,
-                  marginTop: 14, padding: "11px 13px",
+                  marginTop: 11, padding: "9px 11px",
                   borderRadius: t.radius,
                   background: t.id === "amount" ? "transparent" : "#0a1614",
                   border: `1px solid ${t.line}`,
@@ -596,7 +648,7 @@ export default function FuelAdditiveCalculator() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: 12, display: "flex", gap: 6, alignItems: "baseline" }}>
+                <div style={{ marginTop: 9, display: "flex", gap: 6, alignItems: "baseline" }}>
                   <Cap size={12}>
                     {fmtPct(r.basePct)} &rarr; {fmtPct(r.finalPct)} ({r.deltaPct >= 0 ? "+" : ""}
                     {fmtNum(r.deltaPct)} {L.points}) · {L.note}
@@ -620,57 +672,63 @@ export default function FuelAdditiveCalculator() {
         </div>
 
         <div style={{
-          textAlign: "center", marginTop: 14,
+          textAlign: "center", marginTop: 11,
           fontFamily: MONO, fontSize: 10, color: t.dim,
-          letterSpacing: ".08em", textTransform: "uppercase",
+          letterSpacing: ".08em",
         }}>
           {AUTHOR} · v{VERSION}
         </div>
 
         {showTanks && (
-          <div onClick={() => setShowTanks(false)}
-            style={{
-              position: "fixed", inset: 0, zIndex: 50, padding: 20,
-              background: "rgba(0,0,0,.78)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-            <div role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}
-              style={{
-                background: t.card, border: `1px solid ${t.line}`,
-                borderRadius: t.cardRadius, padding: 18,
-                width: "100%", maxWidth: 360,
-              }}>
-              <div style={{ marginBottom: 4 }}><Cap>{L.modalTitle}</Cap></div>
-              <p style={{ color: t.dim, fontSize: 12, margin: "0 0 14px", lineHeight: 1.5 }}>
-                {L.modalHint}
-              </p>
+          <Modal title={L.modalTitle} hint={L.modalHint} closeLabel={L.close}
+            onClose={() => setShowTanks(false)}>
+            {CARS.map((c) => (
+              <button key={c.name}
+                onClick={() => { setTank(c.liters); setShowTanks(false); }}
+                style={{
+                  display: "flex", alignItems: "center", width: "100%",
+                  background: t.presetBg, border: `1px solid ${t.line}`,
+                  borderRadius: t.radius, padding: "13px 14px", marginBottom: 8,
+                  color: t.text, cursor: "pointer", textAlign: "left",
+                }}>
+                <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{c.name}</span>
+                <strong style={{ fontFamily: MONO, fontSize: 17, color: t.add }}>
+                  {c.liters} L
+                </strong>
+              </button>
+            ))}
+          </Modal>
+        )}
 
-              {CARS.map((c) => (
-                <button key={c.name}
-                  onClick={() => { setTank(c.liters); setShowTanks(false); }}
+        {showApps && (
+          <Modal title={L.appsTitle} hint={L.appsHint} closeLabel={L.close}
+            onClose={() => setShowApps(false)}>
+            {APPS.map((a) => {
+              const live = Boolean(a.url);
+              return (
+                <div key={a.id}
                   style={{
                     display: "flex", alignItems: "center", width: "100%",
                     background: t.presetBg, border: `1px solid ${t.line}`,
                     borderRadius: t.radius, padding: "13px 14px", marginBottom: 8,
-                    color: t.text, cursor: "pointer", textAlign: "left",
-                  }}>
-                  <span style={{ flex: 1, fontSize: 14, fontWeight: 600 }}>{c.name}</span>
-                  <strong style={{ fontFamily: MONO, fontSize: 17, color: t.add }}>
-                    {c.liters} L
-                  </strong>
-                </button>
-              ))}
-
-              <button onClick={() => setShowTanks(false)}
-                style={{
-                  width: "100%", marginTop: 8, padding: "12px 0",
-                  background: "transparent", color: t.dim,
-                  border: `1px solid ${t.line}`, borderRadius: t.radius,
-                  fontSize: 12, fontWeight: 700, fontFamily: MONO,
-                  textTransform: "uppercase", letterSpacing: ".1em", cursor: "pointer",
-                }}>{L.close}</button>
-            </div>
-          </div>
+                    opacity: live ? 1 : 0.55, cursor: live ? "pointer" : "default",
+                  }}
+                  onClick={live ? () => window.open(a.url, "_blank") : undefined}>
+                  <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: t.text }}>
+                    {a.name[lang]}
+                  </span>
+                  {!live && (
+                    <span style={{
+                      fontFamily: MONO, fontSize: 9, fontWeight: 700,
+                      textTransform: "uppercase", letterSpacing: ".1em",
+                      color: t.add, border: `1px solid ${t.add}`,
+                      borderRadius: t.radius, padding: "3px 6px", whiteSpace: "nowrap",
+                    }}>{L.soon}</span>
+                  )}
+                </div>
+              );
+            })}
+          </Modal>
         )}
       </div>
     </ThemeCtx.Provider>
