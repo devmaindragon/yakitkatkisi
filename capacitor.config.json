@@ -1,0 +1,6 @@
+{
+  "appId": "com.devmaindragon.yakitkatkisi",
+  "appName": "Yakıt Katkısı",
+  "webDir": "dist",
+  "ios": { "backgroundColor": "#0b0e11" }
+}

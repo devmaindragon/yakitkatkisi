@@ -8,12 +8,15 @@ import { Fuel, Droplet, Target, Check, AlertTriangle, Beaker, Gauge, Flame } fro
    ============================================================ */
 
 export const ADDITIVES = {
-  ethanol: { id: "ethanol", label: "Etanol", name: "Etanol", ron: 109, presets: [10, 20, 25, 50, 85] },
-  toluene: { id: "toluene", label: "Toluen", name: "Toluen", ron: 121, presets: [5, 10, 15, 20, 30] },
-  custom:  { id: "custom",  label: "Özel",   name: "Katkı",  ron: 110, presets: [5, 10, 20, 30, 50] },
+  ethanol: { id: "ethanol", label: { tr: "Etanol", en: "Ethanol", es: "Etanol" }, ron: 109, presets: [10, 20, 25, 50, 85] },
+  toluene: { id: "toluene", label: { tr: "Toluen", en: "Toluene", es: "Tolueno" }, ron: 121, presets: [5, 10, 15, 20, 30] },
+  custom:  { id: "custom",  label: null, ron: 110, presets: [5, 10, 20, 30, 50] },
 };
 
 export const OCTANES = [93, 95, 98, 100];
+
+export const AUTHOR = "dev.main.dragon";
+export const SHOW_AD = true;   // false yaparsan banner alanı tamamen kapanır
 
 export const CARS = [
   { name: "BMW G20 320i", liters: 60 },
@@ -94,6 +97,70 @@ export function blendFromAmount({
   };
 }
 
+
+/* ============================================================
+   DİLLER
+   ============================================================ */
+
+export const LANGS = ["tr", "en", "es"];
+
+const STR = {
+  tr: {
+    title: "YAKIT KATKISI", tankBtn: "Depom kaç litre?",
+    custom: "Özel", customName: "Katkı",
+    customRon: "Katkının Oktanı (RON)", baseOctane: "Depodaki Benzinin Oktanı",
+    tabAmount: "Miktara göre", tabTarget: "Hedefe göre",
+    tankLabel: "Depodaki Yakıt", gasoline: "Benzin", fuel: "Yakıt",
+    current: (n) => `Mevcut ${n}`, toAdd: (n) => `Eklenecek ${n}`,
+    target: (n) => `Hedef ${n}`, resulting: (n) => `Oluşan ${n} Oranı`,
+    result: "Sonuç", totalVolume: "Toplam Hacim",
+    octane: "Karışım Oktanı (RON)", points: "puan",
+    note: "oktan doğrusal karışım tahminidir",
+    empty: "Önce depodaki yakıt miktarını gir.",
+    dilute: "Hedef mevcut oranın altında. Benzin ekleyerek seyreltmen gerekir.",
+    atTarget: "Karışım zaten hedefte. Ekleme gerekmiyor.",
+    tolWarn: "%30 üzeri toluen contalara ve yakıt hortumlarına zarar verebilir, soğuk çalıştırmayı zorlaştırır.",
+    modalTitle: "Depo Hacimleri", modalHint: "Seçince depo hacmi alana yazılır.",
+    close: "Kapat",
+  },
+  en: {
+    title: "FUEL ADDITIVE", tankBtn: "My tank size?",
+    custom: "Custom", customName: "Additive",
+    customRon: "Additive octane (RON)", baseOctane: "Octane of fuel in tank",
+    tabAmount: "By amount", tabTarget: "By target",
+    tankLabel: "Fuel in Tank", gasoline: "Gasoline", fuel: "Fuel",
+    current: (n) => `Current ${n}`, toAdd: (n) => `${n} to Add`,
+    target: (n) => `Target ${n}`, resulting: (n) => `Resulting ${n}`,
+    result: "Result", totalVolume: "Total Volume",
+    octane: "Blend Octane (RON)", points: "pts",
+    note: "octane is a linear-blend estimate",
+    empty: "Enter how much fuel is in the tank first.",
+    dilute: "Target is below the current ratio. You need to dilute with gasoline.",
+    atTarget: "The blend is already on target. Nothing to add.",
+    tolWarn: "Above 30% toluene can damage seals and fuel lines, and makes cold starts harder.",
+    modalTitle: "Tank Sizes", modalHint: "Tap one to fill in the tank field.",
+    close: "Close",
+  },
+  es: {
+    title: "ADITIVO", tankBtn: "¿Mi depósito?",
+    custom: "Otro", customName: "Aditivo",
+    customRon: "Octanaje del aditivo (RON)", baseOctane: "Octanaje del depósito",
+    tabAmount: "Por cantidad", tabTarget: "Por objetivo",
+    tankLabel: "En el Depósito", gasoline: "Gasolina", fuel: "Combustible",
+    current: (n) => `${n} actual`, toAdd: (n) => `${n} a Añadir`,
+    target: (n) => `${n} objetivo`, resulting: (n) => `${n} resultante`,
+    result: "Resultado", totalVolume: "Volumen Total",
+    octane: "Octanaje de la Mezcla (RON)", points: "pts",
+    note: "el octanaje es una estimación de mezcla lineal",
+    empty: "Introduce primero el combustible del depósito.",
+    dilute: "El objetivo está por debajo del nivel actual. Hay que diluir con gasolina.",
+    atTarget: "La mezcla ya está en el objetivo. No hace falta añadir nada.",
+    tolWarn: "Por encima del 30%, el tolueno puede dañar juntas y latiguillos, y dificulta el arranque en frío.",
+    modalTitle: "Capacidad del Depósito", modalHint: "Toca una para rellenar el campo.",
+    close: "Cerrar",
+  },
+};
+
 /* ============================================================
    TEMALAR
    ============================================================ */
@@ -103,25 +170,32 @@ const SANS = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', s
 
 const THEME = {
   id: "amount",
-  bg: "#0a0c0e", card: "#111619", line: "#242e35",
-  text: "#e6edf3", dim: "#66757f",
-  add: "#f0b429", cur: "#f0b429", accent: "#38bdf8",
-  presetBg: "#161d22", presetOn: "#f0b429", presetOnText: "#100c02",
-  danger: "#ff6b5e", dangerBg: "#241110",
+  bg: "#0b0e11", card: "#151a1f", line: "#272f38",
+  text: "#f2f4f6", dim: "#7b8794",
+  add: "#d0202c", cur: "#d0202c", accent: "#f2f4f6",
+  presetBg: "#181e25", presetOn: "#d0202c", presetOnText: "#ffffff",
+  danger: "#f0b429", dangerBg: "#241c10",
   radius: 3, cardRadius: 6, outline: true,
-  numFont: MONO, upper: true, track: 4, thumbRadius: "3px", gap: 8,
+  numFont: MONO, upper: true, track: 3, thumbRadius: "3px", gap: 7,
 };
+
+export const VERSION =
+  typeof __APP_VERSION__ !== "undefined" ? __APP_VERSION__ : "0.0.0";
 
 const ThemeCtx = createContext(THEME);
 const useT = () => useContext(ThemeCtx);
 
+let DEC = ",";      // ondalık ayıracı
+let PCTPRE = true;  // %20 mi 20% mi
+
+const num = (v, d = 1) => v.toFixed(d).replace(".", DEC).replace(DEC + "0", "");
 const fmtL = (v) => {
   if (!isFinite(v)) return "—";
   if (v > 0 && v < 1) return `${(v * 1000).toFixed(0)} mL`;
-  return `${v.toFixed(1).replace(".", ",")} L`;
+  return `${v.toFixed(1).replace(".", DEC)} L`;
 };
-const fmtPct = (v) => `%${v.toFixed(1).replace(".", ",").replace(",0", "")}`;
-const fmtNum = (v, d = 1) => v.toFixed(d).replace(".", ",");
+const fmtPct = (v) => (PCTPRE ? `%${num(v)}` : `${num(v)}%`);
+const fmtNum = (v, d = 1) => v.toFixed(d).replace(".", DEC);
 
 /* ============================================================
    PARÇALAR
@@ -131,18 +205,18 @@ function Card({ children, accent, active, style }) {
   const t = useT();
   return (
     <div style={{
-      background: t.card, borderRadius: t.cardRadius, padding: 16,
+      background: t.card, borderRadius: t.cardRadius, padding: 13,
       border: `1px solid ${active ? accent : t.outline ? t.line : "transparent"}`,
       ...style,
     }}>{children}</div>
   );
 }
 
-function Cap({ children, size = 13 }) {
+function Cap({ children, size = 12 }) {
   const t = useT();
   return (
     <span style={{
-      fontSize: t.upper ? size - 3 : size, color: t.dim,
+      fontSize: t.upper ? size - 3 : size - 1, color: t.dim,
       textTransform: t.upper ? "uppercase" : "none",
       letterSpacing: t.upper ? "0.12em" : 0,
     }}>{children}</span>
@@ -159,8 +233,8 @@ function Segmented({ options, value, onChange, big }) {
           <button key={o.value} onClick={() => onChange(o.value)} aria-pressed={on}
             style={{
               flex: 1, cursor: "pointer",
-              padding: big ? "11px 0" : "8px 0",
-              fontSize: big ? (t.upper ? 13 : 15) : (t.upper ? 12 : 14),
+              padding: big ? "7px 0" : "5px 0",
+              fontSize: big ? (t.upper ? 12 : 14) : (t.upper ? 11 : 13),
               fontWeight: 700, fontFamily: t.numFont,
               textTransform: t.upper ? "uppercase" : "none",
               letterSpacing: t.upper ? ".08em" : 0,
@@ -197,15 +271,15 @@ function NumberField({ value, unit, onChange, min, max }) {
     if (!isNaN(n)) onChange(Math.min(max, Math.max(min, n)));
     setDraft(null);
   };
-  const us = { fontSize: 21, fontWeight: 700, fontFamily: t.numFont, color: t.text };
+  const us = { fontSize: 17, fontWeight: 700, fontFamily: t.numFont, color: t.text };
   return (
     <span style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
-      {unit === "%" && <span style={us}>%</span>}
+      {unit === "%" && PCTPRE && <span style={us}>%</span>}
       <input className="ec-num" inputMode="decimal" value={shown}
         onChange={(e) => setDraft(e.target.value)} onBlur={commit}
         onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
         style={{ width: `${Math.max(2, shown.length)}ch`, fontFamily: t.numFont, color: t.text }} />
-      {unit !== "%" && <span style={us}>{unit}</span>}
+      {unit !== "%" ? <span style={us}>{unit}</span> : !PCTPRE && <span style={us}>%</span>}
     </span>
   );
 }
@@ -214,10 +288,10 @@ function Row({ icon: Icon, label, value, unit, color, ...s }) {
   const t = useT();
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-        <Icon size={20} color={color} strokeWidth={2.2} />
+      <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 11 }}>
+        <Icon size={17} color={color} strokeWidth={2.2} />
         <span style={{
-          fontSize: t.upper ? 14 : 17, fontWeight: 600, flex: 1,
+          fontSize: t.upper ? 12 : 15, fontWeight: 600, flex: 1,
           textTransform: t.upper ? "uppercase" : "none",
           letterSpacing: t.upper ? "0.09em" : 0,
         }}>{label}</span>
@@ -234,9 +308,33 @@ function Readout({ caption, value, color, align = "left" }) {
     <div style={{ textAlign: align, flex: align === "left" ? 1 : "none" }}>
       <div style={{ marginBottom: t.upper ? 6 : 3 }}><Cap size={13}>{caption}</Cap></div>
       <div style={{
-        color, fontSize: t.upper ? 38 : 42, fontWeight: 800,
-        letterSpacing: t.upper ? -1 : -1.6, lineHeight: 1, fontFamily: t.numFont,
+        color, fontSize: t.upper ? 29 : 34, fontWeight: 800,
+        letterSpacing: t.upper ? -0.6 : -1, lineHeight: 1, fontFamily: t.numFont,
       }}>{value}</div>
+    </div>
+  );
+}
+
+/* Reklam alanı — ileride gerçek reklam SDK'sıyla değiştirilecek.
+   Şimdilik public/banner.png (320x50) gösterir. */
+function AdSlot() {
+  const t = useT();
+  const [ok, setOk] = useState(true);
+  if (!ok || !SHOW_AD) return null;
+  return (
+    <div style={{ display: "flex", justifyContent: "center", marginBottom: t.gap }}>
+      <img
+        src={`${import.meta.env.BASE_URL}banner.png`}
+        alt=""
+        width={320}
+        height={50}
+        onError={() => setOk(false)}
+        style={{
+          width: 320, height: 50, maxWidth: "100%", objectFit: "cover",
+          display: "block", borderRadius: t.radius,
+          border: `1px solid ${t.line}`,
+        }}
+      />
     </div>
   );
 }
@@ -255,11 +353,15 @@ export default function FuelAdditiveCalculator() {
   const [targetPct, setTargetPct] = useState(20);
   const [addVolume, setAddVolume] = useState(5);
   const [showTanks, setShowTanks] = useState(false);
+  const [lang, setLang] = useState("tr");
 
   const t = THEME;
+  const L = STR[lang];
+  DEC = lang === "en" ? "." : ",";
+  PCTPRE = lang !== "en";
   const A = additiveId === "custom"
-    ? { ...ADDITIVES.custom, ron: customRon }
-    : ADDITIVES[additiveId];
+    ? { ...ADDITIVES.custom, ron: customRon, name: L.customName }
+    : { ...ADDITIVES[additiveId], name: ADDITIVES[additiveId].label[lang] };
 
   const shared = { tank, currentPct, ronBase: octane, ronAdditive: A.ron };
 
@@ -286,73 +388,76 @@ export default function FuelAdditiveCalculator() {
   const addColor = isAdd ? t.add : t.cur;
 
   const segs = [
-    { v: r.parts.tank, c: t.id === "amount" ? "#3d4a52" : "#2c4640", label: "Yakıt" },
-    { v: r.parts.added, c: addColor, label: isAdd ? A.name : "Benzin" },
+    { v: r.parts.tank, c: "#39424c", label: L.fuel },
+    { v: r.parts.added, c: addColor, label: isAdd ? A.name : L.gasoline },
   ].filter((s) => s.v > 1e-6);
 
   return (
     <ThemeCtx.Provider value={t}>
       <div style={{
         background: t.bg, color: t.text, minHeight: "100%",
-        padding: "20px 16px 40px", fontFamily: SANS,
+        padding: "calc(34px + env(safe-area-inset-top, 0px)) 13px calc(28px + env(safe-area-inset-bottom, 0px))", fontFamily: SANS,
         fontVariantNumeric: "tabular-nums", WebkitTapHighlightColor: "transparent",
         maxWidth: 520, margin: "0 auto",
       }}>
         <style>{`
           .ec-range{-webkit-appearance:none;appearance:none;width:100%;outline:none;touch-action:none;display:block;}
-          .ec-range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:${t.thumbRadius};background:${t.id === "amount" ? t.text : "#fff"};box-shadow:0 1px 5px rgba(0,0,0,.7);cursor:pointer;}
-          .ec-range::-moz-range-thumb{width:22px;height:22px;border:none;border-radius:${t.thumbRadius};background:${t.id === "amount" ? t.text : "#fff"};cursor:pointer;}
+          .ec-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:${t.thumbRadius};background:${t.id === "amount" ? t.text : "#fff"};box-shadow:0 1px 5px rgba(0,0,0,.7);cursor:pointer;}
+          .ec-range::-moz-range-thumb{width:18px;height:18px;border:none;border-radius:${t.thumbRadius};background:${t.id === "amount" ? t.text : "#fff"};cursor:pointer;}
           .ec-range:focus-visible{box-shadow:0 0 0 3px ${t.accent}99;}
-          .ec-num{background:transparent;border:none;font-size:21px;font-weight:700;text-align:right;padding:0;outline:none;font-variant-numeric:tabular-nums;min-width:2ch;}
+          .ec-num{background:transparent;border:none;font-size:17px;font-weight:700;text-align:right;padding:0;outline:none;font-variant-numeric:tabular-nums;min-width:2ch;}
           .ec-num:focus-visible{border-bottom:2px solid ${t.accent};}
           @media (prefers-reduced-motion:no-preference){.ec-bar span{transition:flex-grow .25s ease;}}
         `}</style>
 
-        <header style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5, flexWrap: "wrap" }}>
-          <Flame size={22} color={t.add} strokeWidth={2.2} />
+        <header style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, flexWrap: "wrap", rowGap: 8 }}>
+          <Flame size={19} color={t.add} strokeWidth={2.2} />
           <h1 style={{
-            fontSize: t.upper ? 19 : 27, fontWeight: 800, margin: 0,
-            letterSpacing: t.upper ? "0.16em" : -0.7,
+            fontSize: t.upper ? 15 : 22, fontWeight: 800, margin: 0, whiteSpace: "nowrap",
+            letterSpacing: t.upper ? "0.1em" : -0.7,
             fontFamily: t.upper ? MONO : SANS,
-          }}>YAKIT KATKISI</h1>
+          }}>{L.title}</h1>
           <button onClick={() => setShowTanks(true)}
             style={{
               marginLeft: "auto", cursor: "pointer",
               background: "transparent", color: t.dim,
               border: `1px solid ${t.line}`, borderRadius: t.radius,
-              padding: "5px 9px", fontSize: 10, fontWeight: 700, fontFamily: MONO,
-              textTransform: "uppercase", letterSpacing: ".08em",
-              display: "flex", alignItems: "center", gap: 5,
+              padding: "5px 8px", fontSize: 9, fontWeight: 700, fontFamily: MONO,
+              textTransform: "uppercase", letterSpacing: ".06em", whiteSpace: "nowrap",
+              display: "flex", alignItems: "center", gap: 4,
             }}>
-            <Fuel size={12} strokeWidth={2.4} /> Depom kaç litre?
+            <Fuel size={11} strokeWidth={2.4} /> {L.tankBtn}
           </button>
+          <button
+            onClick={() => setLang(LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length])}
+            aria-label="Language"
+            style={{
+              cursor: "pointer", background: "transparent", color: t.add,
+              border: `1px solid ${t.line}`, borderRadius: t.radius,
+              padding: "5px 7px", fontSize: 9, fontWeight: 800, fontFamily: MONO,
+              textTransform: "uppercase", letterSpacing: ".06em",
+            }}>{lang}</button>
         </header>
-        <p style={{ color: t.dim, fontSize: t.upper ? 12 : 14, margin: "0 0 16px", lineHeight: 1.5 }}>
-          {mode === "target"
-            ? `Hedef orana ulaşmak için gereken ${A.name.toLowerCase()} miktarını hesaplar.`
-            : `Ekleyeceğin ${A.name.toLowerCase()} miktarını sürükle, oluşacak karışımı gösterir.`}
-        </p>
+
+        <AdSlot />
 
         {/* Kurulum: katkı türü + oktan */}
         <Card style={{ marginBottom: t.gap }}>
-          <div style={{ marginBottom: 8 }}><Cap>Katkı Maddesi</Cap></div>
           <Segmented big value={additiveId} onChange={setAdditiveId}
-            options={Object.values(ADDITIVES).map((a) => ({ value: a.id, label: a.label }))} />
+            options={Object.values(ADDITIVES).map((a) => ({ value: a.id, label: a.label ? a.label[lang] : L.custom }))} />
 
           {additiveId === "custom" ? (
             <div style={{ marginTop: 14 }}>
               <div style={{ display: "flex", marginBottom: 8, alignItems: "baseline" }}>
-                <span style={{ flex: 1 }}><Cap>Katkının Oktanı (RON)</Cap></span>
+                <span style={{ flex: 1 }}><Cap>{L.customRon}</Cap></span>
                 <NumberField value={customRon} unit="" onChange={setCustomRon} min={60} max={160} />
               </div>
               <Slider value={customRon} min={60} max={160} step={1}
                 onChange={setCustomRon} color={t.add} />
             </div>
-          ) : (
-            <div style={{ marginTop: 10 }}><Cap size={12}>RON {A.ron}</Cap></div>
-          )}
+          ) : null}
 
-          <div style={{ margin: "18px 0 8px" }}><Cap>Depodaki Benzinin Oktanı</Cap></div>
+          <div style={{ margin: "13px 0 6px" }}><Cap>{L.baseOctane}</Cap></div>
           <Segmented value={octane} onChange={setOctane}
             options={OCTANES.map((o) => ({ value: o, label: String(o) }))} />
         </Card>
@@ -364,19 +469,19 @@ export default function FuelAdditiveCalculator() {
           padding: t.id === "amount" ? 3 : 4, marginBottom: t.gap,
           border: t.outline ? `1px solid ${t.line}` : "none",
         }}>
-          {[["amount", "Miktara göre"], ["target", "Hedefe göre"]].map(([k, label]) => {
+          {[["amount", L.tabAmount], ["target", L.tabTarget]].map(([k, label]) => {
             const on = mode === k;
             return (
               <button key={k} role="tab" aria-selected={on} onClick={() => switchMode(k)}
                 style={{
                   flex: 1, border: "none", borderRadius: t.id === "amount" ? 3 : 99,
-                  padding: "10px 0", fontSize: t.upper ? 12 : 15, fontWeight: 700,
+                  padding: "8px 0", fontSize: t.upper ? 11 : 14, fontWeight: 700,
                   cursor: "pointer",
                   textTransform: t.upper ? "uppercase" : "none",
                   letterSpacing: t.upper ? ".1em" : 0,
                   fontFamily: t.upper ? MONO : SANS,
                   background: on ? t.accent : "transparent",
-                  color: on ? (t.id === "amount" ? "#04222e" : "#2a0512") : t.dim,
+                  color: on ? t.bg : t.dim,
                 }}>{label}</button>
             );
           })}
@@ -384,75 +489,75 @@ export default function FuelAdditiveCalculator() {
 
         <div style={{ display: "flex", flexDirection: "column", gap: t.gap }}>
           <Card>
-            <Row icon={Fuel} label="Depodaki Yakıt" value={tank} unit="L" color={t.cur}
+            <Row icon={Fuel} label={L.tankLabel} value={tank} unit="L" color={t.cur}
               min={0} max={120} step={0.5} onChange={setTank} />
           </Card>
 
           <Card>
-            <Row icon={Droplet} label={`Mevcut ${A.name}`} value={currentPct} unit="%" color={t.cur}
+            <Row icon={Droplet} label={L.current(A.name)} value={currentPct} unit="%" color={t.cur}
               min={0} max={100} step={1} onChange={setCurrentPct} />
           </Card>
 
           {mode === "amount" ? (
             <Card accent={t.add} active={addVolume > 0}>
-              <Row icon={Beaker} label={`Eklenecek ${A.name}`} value={addVolume} unit="L" color={t.add}
+              <Row icon={Beaker} label={L.toAdd(A.name)} value={addVolume} unit="L" color={t.add}
                 min={0} max={addMax} step={0.1} onChange={setAddVolume} />
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 10 }}>
                 <Segmented value={addVolume} onChange={setAddVolume}
                   options={[0.5, 1, 2.5, 5, 10].map((v) => ({
-                    value: v, label: `${String(v).replace(".", ",")} L`,
+                    value: v, label: `${String(v).replace(".", DEC)} L`,
                   }))} />
               </div>
             </Card>
           ) : (
             <Card accent={t.add} active={targetPct !== currentPct}>
-              <Row icon={Target} label={`Hedef ${A.name}`} value={targetPct} unit="%" color={t.add}
+              <Row icon={Target} label={L.target(A.name)} value={targetPct} unit="%" color={t.add}
                 min={0} max={100} step={1} onChange={setTargetPct} />
-              <div style={{ marginTop: 12 }}>
+              <div style={{ marginTop: 10 }}>
                 <Segmented value={targetPct} onChange={setTargetPct}
-                  options={A.presets.map((p) => ({ value: p, label: `%${p}` }))} />
+                  options={A.presets.map((p) => ({ value: p, label: PCTPRE ? `%${p}` : `${p}%` }))} />
               </div>
             </Card>
           )}
 
           {/* SONUÇ */}
-          <Card style={{ padding: 18 }} accent={t.add}
+          <Card style={{ padding: 15 }} accent={t.add}
             active={!r.blocked && r.mode !== "empty"}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-              {r.blocked ? <AlertTriangle size={19} color={t.danger} />
-                : <Check size={19} color={t.add} strokeWidth={3} />}
+            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 12 }}>
+              {r.blocked ? <AlertTriangle size={17} color={t.danger} />
+                : <Check size={17} color={t.add} strokeWidth={3} />}
               <span style={{
-                fontSize: t.upper ? 14 : 17, fontWeight: 700, flex: 1,
+                fontSize: t.upper ? 12 : 15, fontWeight: 700, flex: 1,
                 textTransform: t.upper ? "uppercase" : "none",
                 letterSpacing: t.upper ? "0.12em" : 0,
-              }}>Sonuç</span>
+              }}>{L.result}</span>
             </div>
 
-            {r.mode === "empty" && <p style={{ color: t.dim, margin: 0 }}>Önce depodaki yakıt miktarını gir.</p>}
+            {r.mode === "empty" && <p style={{ color: t.dim, margin: 0 }}>{L.empty}</p>}
             {r.blocked === "gasoline" && (
               <p style={{ color: t.danger, margin: 0, lineHeight: 1.5 }}>
-                Hedef mevcut oranın altında. Benzin ekleyerek seyreltmen gerekir.
+                {L.dilute}
               </p>
             )}
             {r.mode === "ok" && (
-              <p style={{ color: t.add, margin: 0 }}>Karışım zaten hedefte. Ekleme gerekmiyor.</p>
+              <p style={{ color: t.add, margin: 0 }}>{L.atTarget}</p>
             )}
 
             {!r.blocked && ["additive", "gasoline", "amount"].includes(r.mode) && (
               <>
                 <div style={{ display: "flex", alignItems: "flex-end" }}>
                   {r.mode === "amount"
-                    ? <Readout caption={`Oluşan ${A.name} Oranı`} value={fmtPct(r.finalPct)} color={t.add} />
-                    : <Readout caption={`Eklenecek ${isAdd ? A.name : "Benzin"}`} value={fmtL(r.addAmount)} color={addColor} />}
-                  <Readout caption="Toplam Hacim" value={fmtL(r.totalVolume)} color={t.accent} align="right" />
+                    ? <Readout caption={L.resulting(A.name)} value={fmtPct(r.finalPct)} color={t.add} />
+                    : <Readout caption={L.toAdd(isAdd ? A.name : L.gasoline)} value={fmtL(r.addAmount)} color={addColor} />}
+                  <Readout caption={L.totalVolume} value={fmtL(r.totalVolume)} color={t.accent} align="right" />
                 </div>
 
                 {/* Karışım şeridi */}
                 <div className="ec-bar" style={{
                   display: "flex", gap: t.id === "amount" ? 2 : 0,
-                  height: t.id === "amount" ? 8 : 12,
+                  height: t.id === "amount" ? 7 : 11,
                   borderRadius: t.id === "amount" ? 1 : 99,
-                  overflow: "hidden", marginTop: 20,
+                  overflow: "hidden", marginTop: 14,
                   background: t.id === "amount" ? "transparent" : t.line,
                 }}>
                   {segs.map((s, i) => <span key={i} style={{ flexGrow: s.v, background: s.c }} />)}
@@ -469,22 +574,22 @@ export default function FuelAdditiveCalculator() {
                 {/* Oktan */}
                 <div style={{
                   display: "flex", alignItems: "center", gap: 12,
-                  marginTop: 18, padding: "14px 16px",
+                  marginTop: 14, padding: "11px 13px",
                   borderRadius: t.radius,
                   background: t.id === "amount" ? "transparent" : "#0a1614",
                   border: `1px solid ${t.line}`,
                 }}>
-                  <Gauge size={20} color={t.accent} strokeWidth={2.2} />
+                  <Gauge size={17} color={t.accent} strokeWidth={2.2} />
                   <div style={{ flex: 1 }}>
-                    <Cap size={12}>Karışım Oktanı (RON)</Cap>
+                    <Cap size={12}>{L.octane}</Cap>
                     <div style={{
-                      fontFamily: t.numFont, fontSize: 15, color: t.dim, marginTop: 3,
+                      fontFamily: t.numFont, fontSize: 13, color: t.dim, marginTop: 2,
                     }}>
                       {octane} &rarr; <strong style={{ color: t.text }}>{fmtNum(r.finalRon)}</strong>
                     </div>
                   </div>
                   <div style={{
-                    fontFamily: t.numFont, fontSize: 30, fontWeight: 800,
+                    fontFamily: t.numFont, fontSize: 24, fontWeight: 800,
                     color: t.accent, letterSpacing: -0.8,
                   }}>
                     {r.deltaRon >= 0 ? "+" : ""}{fmtNum(r.deltaRon)}
@@ -494,7 +599,7 @@ export default function FuelAdditiveCalculator() {
                 <div style={{ marginTop: 12, display: "flex", gap: 6, alignItems: "baseline" }}>
                   <Cap size={12}>
                     {fmtPct(r.basePct)} &rarr; {fmtPct(r.finalPct)} ({r.deltaPct >= 0 ? "+" : ""}
-                    {fmtNum(r.deltaPct)} puan) · oktan doğrusal karışım tahminidir
+                    {fmtNum(r.deltaPct)} {L.points}) · {L.note}
                   </Cap>
                 </div>
 
@@ -506,12 +611,20 @@ export default function FuelAdditiveCalculator() {
                     border: t.outline ? `1px solid ${t.danger}55` : "none",
                   }}>
                     <AlertTriangle size={17} style={{ flexShrink: 0, marginTop: 1 }} />
-                    <span>%30 üzeri toluen contalara ve yakıt hortumlarına zarar verebilir, soğuk çalıştırmayı zorlaştırır.</span>
+                    <span>{L.tolWarn}</span>
                   </div>
                 )}
               </>
             )}
           </Card>
+        </div>
+
+        <div style={{
+          textAlign: "center", marginTop: 14,
+          fontFamily: MONO, fontSize: 10, color: t.dim,
+          letterSpacing: ".08em", textTransform: "uppercase",
+        }}>
+          {AUTHOR} · v{VERSION}
         </div>
 
         {showTanks && (
@@ -527,9 +640,9 @@ export default function FuelAdditiveCalculator() {
                 borderRadius: t.cardRadius, padding: 18,
                 width: "100%", maxWidth: 360,
               }}>
-              <div style={{ marginBottom: 4 }}><Cap>Depo Hacimleri</Cap></div>
+              <div style={{ marginBottom: 4 }}><Cap>{L.modalTitle}</Cap></div>
               <p style={{ color: t.dim, fontSize: 12, margin: "0 0 14px", lineHeight: 1.5 }}>
-                Seçince depo hacmi alana yazılır.
+                {L.modalHint}
               </p>
 
               {CARS.map((c) => (
@@ -555,7 +668,7 @@ export default function FuelAdditiveCalculator() {
                   border: `1px solid ${t.line}`, borderRadius: t.radius,
                   fontSize: 12, fontWeight: 700, fontFamily: MONO,
                   textTransform: "uppercase", letterSpacing: ".1em", cursor: "pointer",
-                }}>Kapat</button>
+                }}>{L.close}</button>
             </div>
           </div>
         )}
