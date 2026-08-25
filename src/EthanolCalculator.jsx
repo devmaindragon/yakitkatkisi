@@ -18,6 +18,11 @@ export const OCTANES = [93, 95, 98, 100];
 export const AUTHOR = "dev.main.dragon";
 export const SHOW_AD = true;   // false yaparsan banner alanı tamamen kapanır
 
+export const SHOW_APPS_BTN = false;  // Güç Hesaplama çıkınca true yap
+
+export const PRIVACY_URL = "https://devmaindragon.github.io/yakitkatkisi/privacy.html";
+export const SUPPORT_URL = "https://devmaindragon.github.io/yakitkatkisi/support.html";
+
 export const APPS = [
   { id: "power", name: { tr: "Güç Hesaplama", en: "Power Calculator", es: "Cálculo de Potencia" }, url: null },
 ];
@@ -124,6 +129,15 @@ const STR = {
     dilute: "Hedef mevcut oranın altında. Benzin ekleyerek seyreltmen gerekir.",
     atTarget: "Karışım zaten hedefte. Ekleme gerekmiyor.",
     tolWarn: "%30 üzeri toluen contalara ve yakıt hortumlarına zarar verebilir, soğuk çalıştırmayı zorlaştırır.",
+    privacy: "Gizlilik", support: "Destek",
+    discTitle: "Önce Şunu Oku", discOk: "Anladım",
+    disc: [
+      "Sonuçlar tahmindir. Karıştırmadan önce kendin doğrula.",
+      "Yakıta katkı eklemek garantiyi düşürebilir, emisyon ve yakıt mevzuatına aykırı olabilir. Yerel kuralları kontrol et.",
+      "Toluen zehirlidir. Buharını soluma, cilde temas ettirme, açık havada çalış. Yüksek oranlar conta ve hortumlara zarar verir.",
+      "Yüksek etanol oranları uygun donanımı olmayan araçlarda yakıt sistemine zarar verebilir.",
+      "Kullanım tamamen kendi sorumluluğundadır.",
+    ],
     appsBtn: "Diğer uygulamalar", appsTitle: "Diğer Uygulamalar", soon: "Çok yakında", appsHint: "Yeni araçlar üzerinde çalışıyoruz.",
     modalTitle: "Depo Hacimleri", modalHint: "Seçince depo hacmi alana yazılır.",
     close: "Kapat",
@@ -143,6 +157,15 @@ const STR = {
     dilute: "Target is below the current ratio. You need to dilute with gasoline.",
     atTarget: "The blend is already on target. Nothing to add.",
     tolWarn: "Above 30% toluene can damage seals and fuel lines, and makes cold starts harder.",
+    privacy: "Privacy", support: "Support",
+    discTitle: "Read This First", discOk: "I understand",
+    disc: [
+      "Results are estimates. Verify them yourself before mixing.",
+      "Blending additives may void your warranty and can breach emissions and fuel regulations. Check your local rules.",
+      "Toluene is toxic. Do not inhale the vapour, avoid skin contact, work outdoors. High ratios damage seals and hoses.",
+      "High ethanol ratios can damage the fuel system of vehicles that are not equipped for them.",
+      "You use this app entirely at your own risk.",
+    ],
     appsBtn: "Other apps", appsTitle: "Other Apps", soon: "Coming soon", appsHint: "More tools are on the way.",
     modalTitle: "Tank Sizes", modalHint: "Tap one to fill in the tank field.",
     close: "Close",
@@ -162,6 +185,15 @@ const STR = {
     dilute: "El objetivo está por debajo del nivel actual. Hay que diluir con gasolina.",
     atTarget: "La mezcla ya está en el objetivo. No hace falta añadir nada.",
     tolWarn: "Por encima del 30%, el tolueno puede dañar juntas y latiguillos, y dificulta el arranque en frío.",
+    privacy: "Privacidad", support: "Soporte",
+    discTitle: "Lee Esto Primero", discOk: "Entendido",
+    disc: [
+      "Los resultados son estimaciones. Verifícalos antes de mezclar.",
+      "Añadir aditivos puede anular la garantía e incumplir la normativa de emisiones y combustibles. Consulta las normas locales.",
+      "El tolueno es tóxico. No inhales el vapor, evita el contacto con la piel, trabaja al aire libre. En proporciones altas daña juntas y latiguillos.",
+      "Proporciones altas de etanol pueden dañar el sistema de combustible de vehículos no preparados.",
+      "El uso de esta app es bajo tu entera responsabilidad.",
+    ],
     appsBtn: "Otras apps", appsTitle: "Otras Apps", soon: "Muy pronto", appsHint: "Estamos preparando más herramientas.",
     modalTitle: "Capacidad del Depósito", modalHint: "Toca una para rellenar el campo.",
     close: "Cerrar",
@@ -347,10 +379,10 @@ function AdSlot() {
   );
 }
 
-function Modal({ title, hint, onClose, closeLabel, children }) {
+function Modal({ title, hint, onClose, closeLabel, children, dismissible = true }) {
   const t = useT();
   return (
-    <div onClick={onClose}
+    <div onClick={dismissible ? onClose : undefined}
       style={{
         position: "fixed", inset: 0, zIndex: 50, padding: 20,
         background: "rgba(0,0,0,.78)",
@@ -361,9 +393,13 @@ function Modal({ title, hint, onClose, closeLabel, children }) {
           background: t.card, border: `1px solid ${t.line}`,
           borderRadius: t.cardRadius, padding: 18,
           width: "100%", maxWidth: 360,
+          maxHeight: "82vh", overflowY: "auto",
         }}>
         <div style={{ marginBottom: 4 }}><Cap>{title}</Cap></div>
-        <p style={{ color: t.dim, fontSize: 12, margin: "0 0 14px", lineHeight: 1.5 }}>{hint}</p>
+        {hint && (
+          <p style={{ color: t.dim, fontSize: 12, margin: "0 0 14px", lineHeight: 1.5 }}>{hint}</p>
+        )}
+        {!hint && <div style={{ height: 12 }} />}
         {children}
         <button onClick={onClose}
           style={{
@@ -393,6 +429,7 @@ export default function FuelAdditiveCalculator() {
   const [addVolume, setAddVolume] = useState(5);
   const [showTanks, setShowTanks] = useState(false);
   const [showApps, setShowApps] = useState(false);
+  const [showDisc, setShowDisc] = useState(true);
   const [lang, setLang] = useState("tr");
 
   const t = THEME;
@@ -462,6 +499,7 @@ export default function FuelAdditiveCalculator() {
             letterSpacing: t.upper ? "0.1em" : -0.7,
             fontFamily: t.upper ? MONO : SANS,
           }}>{L.title}</h1>
+          {SHOW_APPS_BTN && (
           <button onClick={() => setShowApps(true)}
             style={{
               marginLeft: "auto", cursor: "pointer",
@@ -473,6 +511,7 @@ export default function FuelAdditiveCalculator() {
             }}>
             <Grid2x2 size={11} strokeWidth={2.4} /> {L.appsBtn}
           </button>
+          )}
           <button
             onClick={() => setLang(LANGS[(LANGS.indexOf(lang) + 1) % LANGS.length])}
             aria-label="Language"
@@ -674,10 +713,29 @@ export default function FuelAdditiveCalculator() {
         <div style={{
           textAlign: "center", marginTop: 11,
           fontFamily: MONO, fontSize: 10, color: t.dim,
-          letterSpacing: ".08em",
+          letterSpacing: ".08em", lineHeight: 1.7,
         }}>
-          {AUTHOR} · v{VERSION}
+          {AUTHOR} · v{VERSION} ·{" "}
+          <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer"
+            style={{ color: t.dim }}>{L.privacy}</a> ·{" "}
+          <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer"
+            style={{ color: t.dim }}>{L.support}</a>
         </div>
+
+        {showDisc && (
+          <Modal title={L.discTitle} closeLabel={L.discOk} dismissible={false}
+            onClose={() => setShowDisc(false)}>
+            {L.disc.map((line, i) => (
+              <div key={i} style={{
+                display: "flex", gap: 8, marginBottom: 9,
+                fontSize: 12.5, lineHeight: 1.5, color: t.text,
+              }}>
+                <span style={{ color: t.add, flexShrink: 0 }}>—</span>
+                <span>{line}</span>
+              </div>
+            ))}
+          </Modal>
+        )}
 
         {showTanks && (
           <Modal title={L.modalTitle} hint={L.modalHint} closeLabel={L.close}

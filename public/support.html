@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Destek — Yakıt Katkısı</title>
+<style>
+  :root { color-scheme: dark; }
+  body {
+    margin: 0; padding: 40px 20px 80px;
+    background: #0b0e11; color: #f2f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.65;
+  }
+  main { max-width: 680px; margin: 0 auto; }
+  h1 { font-size: 26px; letter-spacing: -0.5px; margin: 0 0 6px; }
+  h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .1em;
+       color: #d0202c; margin: 34px 0 10px; }
+  h3 { font-size: 16px; margin: 22px 0 4px; color: #f2f4f6; }
+  p, li { color: #c8ced5; font-size: 15px; }
+  ul { padding-left: 20px; }
+  .date { color: #7b8794; font-size: 13px; margin: 0 0 30px; }
+  .lang { color: #7b8794; font-size: 13px; margin-top: 50px;
+          border-top: 1px solid #272f38; padding-top: 24px; }
+  a { color: #d0202c; }
+  .warn { border: 1px solid #d0202c; border-radius: 6px; padding: 14px 16px;
+          margin: 24px 0; }
+  .warn p { color: #f2f4f6; margin: 0; font-size: 14px; }
+  code { background: #151a1f; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Destek</h1>
+<p class="date">Yakıt Katkısı · dev.main.dragon</p>
+
+<h2>İletişim</h2>
+<p>Soru, hata bildirimi ve öneriler için:
+<a href="mailto:dev.main.dragon@gmail.com">dev.main.dragon@gmail.com</a><br>
+Genelde birkaç gün içinde yanıtlıyorum.</p>
+
+<h2>Uygulama Ne Yapıyor</h2>
+<p>Deponuzdaki yakıta etanol veya toluen eklerken gereken miktarı hesaplar. İki yönde
+çalışır: hedef bir oran verirsiniz, kaç litre eklemeniz gerektiğini söyler; ya da
+ekleyeceğiniz miktarı verirsiniz, oluşacak oranı gösterir. Ayrıca karışımın tahmini
+oktan değerini hesaplar.</p>
+
+<div class="warn">
+<p><strong>Güvenlik uyarısı.</strong> Sonuçlar tahmindir. Yakıta katkı eklemek garantiyi
+düşürebilir, emisyon ve yakıt mevzuatına aykırı olabilir. Toluen zehirlidir; buharını
+solumayın, cilde temas ettirmeyin, açık havada çalışın. Yüksek oranlar conta ve
+hortumlara zarar verir. Kullanım tamamen kendi sorumluluğunuzdadır.</p>
+</div>
+
+<h2>Sık Sorulanlar</h2>
+
+<h3>Oktan hesabı ne kadar doğru?</h3>
+<p>Hacimsel doğrusal karışım formülü kullanılıyor: <code>(V₁·RON₁ + V₂·RON₂) / V_toplam</code>.
+Gerçekte etanolün karışım oktanı doğrusal değildir; düşük oranlarda beklenenden fazla
+katkı yapar. Yani gerçek değer genelde bu tahminin biraz üzerindedir. Uygulama içinde de
+bu not yer alır.</p>
+
+<h3>Seçtiğim oktan neyi ifade ediyor?</h3>
+<p>Depodaki yakıtın pompa değerini. İçindeki mevcut etanol o değere zaten dahildir, ayrıca
+hesaba katılmaz.</p>
+
+<h3>Depodaki mevcut oranı nereden bileceğim?</h3>
+<p>Türkiye ve AB'de satılan kurşunsuz benzin genellikle %5–10 arası etanol içerir. Kesin
+değer için pompa etiketine bakın (E5, E10 gibi) veya bir etanol test kiti kullanın.</p>
+
+<h3>Aracımın deposu listede yok</h3>
+<p>Depodaki yakıt değerini elle de girebilirsiniz — sayının üzerine dokunup yazın. Listeye
+araç eklenmesini isterseniz e-posta atın.</p>
+
+<h3>Veri kaydediliyor mu?</h3>
+<p>Hayır. Girdiğiniz hiçbir değer saklanmaz, hiçbir yere gönderilmez. Ayrıntı için
+<a href="privacy.html">gizlilik politikası</a>.</p>
+
+<div class="lang">
+
+<h2>Support (English)</h2>
+<p>Contact: <a href="mailto:dev.main.dragon@gmail.com">dev.main.dragon@gmail.com</a></p>
+<p>The app calculates how much ethanol or toluene to add to the fuel in your tank. It works
+in both directions: give a target ratio and it tells you how many litres to add, or give an
+amount and it shows the resulting ratio. It also estimates the octane of the blend using a
+linear volumetric blend, which tends to read slightly low for ethanol at small ratios. The
+octane you select is the pump rating of the fuel already in your tank.</p>
+<p><strong>Safety.</strong> Results are estimates. Blending additives may void your warranty
+and can breach emissions and fuel regulations. Toluene is toxic — do not inhale the vapour,
+avoid skin contact, work outdoors. High ratios damage seals and hoses. You use this app
+entirely at your own risk.</p>
+<p>No data is collected or stored. See the <a href="privacy.html">privacy policy</a>.</p>
+
+<h2>Soporte (Español)</h2>
+<p>Contacto: <a href="mailto:dev.main.dragon@gmail.com">dev.main.dragon@gmail.com</a></p>
+<p>La aplicación calcula cuánto etanol o tolueno añadir al combustible del depósito.
+Funciona en ambos sentidos: indicas una proporción objetivo y te dice cuántos litros
+añadir, o indicas una cantidad y te muestra la proporción resultante. También estima el
+octanaje de la mezcla mediante una mezcla lineal por volumen, que suele quedarse algo corta
+con el etanol en proporciones bajas. El octanaje que seleccionas es el valor de surtidor del
+combustible que ya está en el depósito.</p>
+<p><strong>Seguridad.</strong> Los resultados son estimaciones. Añadir aditivos puede anular
+la garantía e incumplir la normativa de emisiones y combustibles. El tolueno es tóxico: no
+inhales el vapor, evita el contacto con la piel, trabaja al aire libre. En proporciones altas
+daña juntas y latiguillos. El uso es bajo tu entera responsabilidad.</p>
+<p>No se recopila ni almacena ningún dato. Consulta la
+<a href="privacy.html">política de privacidad</a>.</p>
+
+</div>
+</main>
+</body>
+</html>
