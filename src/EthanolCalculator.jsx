@@ -66,16 +66,18 @@ export function calculateBlend({
   const finalPct = totalVolume > EPS
     ? ((baseVolume * baseEthanol + addAmount * addedShare) / totalVolume) * 100 : 0;
 
+  // Seçilen oktan katkısız benzinin değeri; depodaki mevcut katkı da hesaba girer
+  const baseRon = (1 - baseEthanol) * ronBase + baseEthanol * ronAdditive;
   const addedRon = mode === "additive" ? ronAdditive : ronBase;
   const finalRon = totalVolume > EPS
-    ? (baseVolume * ronBase + addAmount * addedRon) / totalVolume : ronBase;
+    ? (baseVolume * baseRon + addAmount * addedRon) / totalVolume : baseRon;
 
   return {
     mode, blocked, baseVolume,
     basePct: baseEthanol * 100,
     addAmount, totalVolume, finalPct,
     deltaPct: finalPct - baseEthanol * 100,
-    ronBase, finalRon, deltaRon: finalRon - ronBase,
+    ronBase, baseRon, finalRon, deltaRon: finalRon - baseRon,
     parts: { tank, added: addAmount },
   };
 }
@@ -92,8 +94,9 @@ export function blendFromAmount({
   const totalVolume = baseVolume + addVolume;
   const finalPct = totalVolume > EPS
     ? ((baseVolume * c + addVolume * p) / totalVolume) * 100 : 0;
+  const baseRon = (1 - c) * ronBase + c * ronAdditive;
   const finalRon = totalVolume > EPS
-    ? (baseVolume * ronBase + addVolume * ronAdditive) / totalVolume : ronBase;
+    ? (baseVolume * baseRon + addVolume * ronAdditive) / totalVolume : baseRon;
 
   return {
     mode: baseVolume <= EPS ? "empty" : "amount",
@@ -101,7 +104,7 @@ export function blendFromAmount({
     basePct: c * 100,
     addAmount: addVolume, totalVolume, finalPct,
     deltaPct: finalPct - c * 100,
-    ronBase, finalRon, deltaRon: finalRon - ronBase,
+    ronBase, baseRon, finalRon, deltaRon: finalRon - baseRon,
     parts: { tank, added: addVolume },
   };
 }
@@ -117,7 +120,7 @@ const STR = {
   tr: {
     title: "YAKIT KATKISI", tankBtn: "Depom kaç litre?",
     custom: "Özel", customName: "Katkı",
-    customRon: "Katkının Oktanı (RON)", baseOctane: "Depodaki Benzinin Oktanı",
+    customRon: "Katkının Oktanı (RON)", baseOctane: "Benzinin Oktanı (katkısız)",
     tabAmount: "Miktara göre", tabTarget: "Hedefe göre",
     tankLabel: "Depodaki Yakıt", gasoline: "Benzin", fuel: "Yakıt",
     current: (n) => `Mevcut ${n}`, toAdd: (n) => `Eklenecek ${n}`,
@@ -129,6 +132,12 @@ const STR = {
     dilute: "Hedef mevcut oranın altında. Benzin ekleyerek seyreltmen gerekir.",
     atTarget: "Karışım zaten hedefte. Ekleme gerekmiyor.",
     tolWarn: "%30 üzeri toluen contalara ve yakıt hortumlarına zarar verebilir, soğuk çalıştırmayı zorlaştırır.",
+    priorTitle: "Depomda zaten katkı var",
+    priorWhich: "Hangi katkı", priorVolume: "Eklenmiş miktar",
+    priorRon: "Bu katkının oktanı (RON)",
+    pumpEthanol: "Pompa Yakıtındaki Etanol",
+    neatOctane: "Saf Benzinin Oktanı",
+    tankOctane: "Depodaki karışımın oktanı",
     privacy: "Gizlilik", support: "Destek",
     discTitle: "Önce Şunu Oku", discOk: "Anladım",
     disc: [
@@ -145,7 +154,7 @@ const STR = {
   en: {
     title: "FUEL ADDITIVE", tankBtn: "My tank size?",
     custom: "Custom", customName: "Additive",
-    customRon: "Additive octane (RON)", baseOctane: "Octane of fuel in tank",
+    customRon: "Additive octane (RON)", baseOctane: "Base gasoline octane",
     tabAmount: "By amount", tabTarget: "By target",
     tankLabel: "Fuel in Tank", gasoline: "Gasoline", fuel: "Fuel",
     current: (n) => `Current ${n}`, toAdd: (n) => `${n} to Add`,
@@ -157,6 +166,12 @@ const STR = {
     dilute: "Target is below the current ratio. You need to dilute with gasoline.",
     atTarget: "The blend is already on target. Nothing to add.",
     tolWarn: "Above 30% toluene can damage seals and fuel lines, and makes cold starts harder.",
+    priorTitle: "My tank already has an additive",
+    priorWhich: "Which additive", priorVolume: "Amount already added",
+    priorRon: "Octane of that additive (RON)",
+    pumpEthanol: "Ethanol in Pump Fuel",
+    neatOctane: "Octane of Neat Gasoline",
+    tankOctane: "Octane now in the tank",
     privacy: "Privacy", support: "Support",
     discTitle: "Read This First", discOk: "I understand",
     disc: [
@@ -173,7 +188,7 @@ const STR = {
   es: {
     title: "ADITIVO", tankBtn: "¿Mi depósito?",
     custom: "Otro", customName: "Aditivo",
-    customRon: "Octanaje del aditivo (RON)", baseOctane: "Octanaje del depósito",
+    customRon: "Octanaje del aditivo (RON)", baseOctane: "Octanaje de la gasolina base",
     tabAmount: "Por cantidad", tabTarget: "Por objetivo",
     tankLabel: "En el Depósito", gasoline: "Gasolina", fuel: "Combustible",
     current: (n) => `${n} actual`, toAdd: (n) => `${n} a Añadir`,
@@ -185,6 +200,12 @@ const STR = {
     dilute: "El objetivo está por debajo del nivel actual. Hay que diluir con gasolina.",
     atTarget: "La mezcla ya está en el objetivo. No hace falta añadir nada.",
     tolWarn: "Por encima del 30%, el tolueno puede dañar juntas y latiguillos, y dificulta el arranque en frío.",
+    priorTitle: "Mi depósito ya lleva aditivo",
+    priorWhich: "Qué aditivo", priorVolume: "Cantidad ya añadida",
+    priorRon: "Octanaje de ese aditivo (RON)",
+    pumpEthanol: "Etanol del Combustible",
+    neatOctane: "Octanaje de la Gasolina",
+    tankOctane: "Octanaje actual del depósito",
     privacy: "Privacidad", support: "Soporte",
     discTitle: "Lee Esto Primero", discOk: "Entendido",
     disc: [
@@ -430,6 +451,10 @@ export default function FuelAdditiveCalculator() {
   const [showTanks, setShowTanks] = useState(false);
   const [showApps, setShowApps] = useState(false);
   const [showDisc, setShowDisc] = useState(true);
+  const [hasPrior, setHasPrior] = useState(false);
+  const [priorId, setPriorId] = useState("ethanol");
+  const [priorVol, setPriorVol] = useState(2);
+  const [priorRon, setPriorRon] = useState(110);
   const [lang, setLang] = useState("tr");
 
   const t = THEME;
@@ -440,13 +465,25 @@ export default function FuelAdditiveCalculator() {
     ? { ...ADDITIVES.custom, ron: customRon, name: L.customName }
     : { ...ADDITIVES[additiveId], name: ADDITIVES[additiveId].label[lang] };
 
-  const shared = { tank, currentPct, ronBase: octane, ronAdditive: A.ron };
+  // Depodaki karışım = pompa yakıtı + kullanıcının önceden eklediği katkı
+  const priorRonVal = priorId === "custom" ? priorRon : ADDITIVES[priorId].ron;
+  const pVol = hasPrior ? Math.min(priorVol, tank) : 0;
+  const pumpVol = Math.max(0, tank - pVol);
+  const effRonBase = tank > 0 ? (pumpVol * octane + pVol * priorRonVal) / tank : octane;
+  const effCurrentPct = tank > 0
+    ? ((pumpVol * (currentPct / 100) + (hasPrior && priorId === additiveId ? pVol : 0)) / tank) * 100
+    : currentPct;
+
+  const shared = {
+    tank, currentPct: effCurrentPct,
+    ronBase: effRonBase, ronAdditive: A.ron,
+  };
 
   const r = useMemo(
     () => mode === "target"
       ? calculateBlend({ ...shared, targetPct })
       : blendFromAmount({ ...shared, addVolume }),
-    [mode, additiveId, customRon, octane, tank, currentPct, targetPct, addVolume]
+    [mode, additiveId, customRon, octane, tank, currentPct, targetPct, addVolume, hasPrior, priorId, priorVol, priorRon]
   );
 
   const switchMode = (next) => {
@@ -539,7 +576,7 @@ export default function FuelAdditiveCalculator() {
             </div>
           ) : null}
 
-          <div style={{ margin: "10px 0 5px" }}><Cap>{L.baseOctane}</Cap></div>
+          <div style={{ margin: "10px 0 5px" }}><Cap>{hasPrior ? L.neatOctane : L.baseOctane}</Cap></div>
           <Segmented value={octane} onChange={setOctane}
             options={OCTANES.map((o) => ({ value: o, label: String(o) }))} />
         </Card>
@@ -585,7 +622,7 @@ export default function FuelAdditiveCalculator() {
           </Card>
 
           <Card>
-            <Row icon={Droplet} label={L.current(A.name)} value={currentPct} unit="%" color={t.cur}
+            <Row icon={Droplet} label={hasPrior ? L.pumpEthanol : L.current(A.name)} value={currentPct} unit="%" color={t.cur}
               min={0} max={100} step={1} onChange={setCurrentPct} />
           </Card>
 
@@ -676,7 +713,7 @@ export default function FuelAdditiveCalculator() {
                     <div style={{
                       fontFamily: t.numFont, fontSize: 13, color: t.dim, marginTop: 2,
                     }}>
-                      {octane} &rarr; <strong style={{ color: t.text }}>{fmtNum(r.finalRon)}</strong>
+                      {fmtNum(r.baseRon)} &rarr; <strong style={{ color: t.text }}>{fmtNum(r.finalRon)}</strong>
                     </div>
                   </div>
                   <div style={{
