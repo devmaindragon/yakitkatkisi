@@ -140,6 +140,7 @@ const STR = {
     tankOctane: "Depodaki karışımın oktanı",
     privacy: "Gizlilik", support: "Destek",
     discTitle: "Önce Şunu Oku", discOk: "Anladım",
+    discHide: "Bir daha gösterme", warning: "Uyarı",
     disc: [
       "Sonuçlar tahmindir. Karıştırmadan önce kendin doğrula.",
       "Yakıta katkı eklemek garantiyi düşürebilir, emisyon ve yakıt mevzuatına aykırı olabilir. Yerel kuralları kontrol et.",
@@ -174,6 +175,7 @@ const STR = {
     tankOctane: "Octane now in the tank",
     privacy: "Privacy", support: "Support",
     discTitle: "Read This First", discOk: "I understand",
+    discHide: "Don\u2019t show again", warning: "Warning",
     disc: [
       "Results are estimates. Verify them yourself before mixing.",
       "Blending additives may void your warranty and can breach emissions and fuel regulations. Check your local rules.",
@@ -208,6 +210,7 @@ const STR = {
     tankOctane: "Octanaje actual del depósito",
     privacy: "Privacidad", support: "Soporte",
     discTitle: "Lee Esto Primero", discOk: "Entendido",
+    discHide: "No mostrar de nuevo", warning: "Aviso",
     disc: [
       "Los resultados son estimaciones. Verifícalos antes de mezclar.",
       "Añadir aditivos puede anular la garantía e incumplir la normativa de emisiones y combustibles. Consulta las normas locales.",
@@ -242,6 +245,17 @@ const THEME = {
 export const VERSION =
   typeof __APP_VERSION__ !== "undefined" ? __APP_VERSION__ : "0.0.0";
 
+/* Uyarı metni değişirse bu numarayı artır — herkese bir kez daha gösterilir */
+export const DISC_VERSION = 1;
+
+const KEY_LANG = "yk.lang";
+const KEY_DISC = "yk.discOk";
+
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* yok say */ } },
+};
+
 /* Cihaz dili tr/en/es ise onu kullan, değilse İngilizce */
 function detectLang() {
   try {
@@ -252,6 +266,11 @@ function detectLang() {
     }
   } catch { /* yok say */ }
   return "en";
+}
+
+function initialLang() {
+  const saved = store.get(KEY_LANG);
+  return LANGS.includes(saved) ? saved : detectLang();
 }
 
 const ThemeCtx = createContext(THEME);
@@ -462,12 +481,21 @@ export default function FuelAdditiveCalculator() {
   const [addVolume, setAddVolume] = useState(5);
   const [showTanks, setShowTanks] = useState(false);
   const [showApps, setShowApps] = useState(false);
-  const [showDisc, setShowDisc] = useState(true);
+  const [showDisc, setShowDisc] = useState(
+    () => store.get(KEY_DISC) !== String(DISC_VERSION)
+  );
+  const [discHide, setDiscHide] = useState(false);
+
+  const closeDisc = () => {
+    if (discHide) store.set(KEY_DISC, String(DISC_VERSION));
+    setShowDisc(false);
+  };
   const [hasPrior, setHasPrior] = useState(false);
   const [priorId, setPriorId] = useState("ethanol");
   const [priorVol, setPriorVol] = useState(2);
   const [priorRon, setPriorRon] = useState(110);
-  const [lang, setLang] = useState(detectLang);
+  const [lang, setLangState] = useState(initialLang);
+  const setLang = (l) => { setLangState(l); store.set(KEY_LANG, l); };
 
   const t = THEME;
   const L = STR[lang];
@@ -765,6 +793,12 @@ export default function FuelAdditiveCalculator() {
           letterSpacing: ".08em", lineHeight: 1.7,
         }}>
           {AUTHOR} · v{VERSION} ·{" "}
+          <button onClick={() => { setDiscHide(false); setShowDisc(true); }}
+            style={{
+              background: "none", border: "none", padding: 0, cursor: "pointer",
+              color: t.dim, font: "inherit", textDecoration: "underline",
+              textUnderlineOffset: 3,
+            }}>{L.warning}</button> ·{" "}
           <a href={PRIVACY_URL} target="_blank" rel="noopener noreferrer"
             style={{ color: t.dim }}>{L.privacy}</a> ·{" "}
           <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer"
@@ -773,7 +807,7 @@ export default function FuelAdditiveCalculator() {
 
         {showDisc && (
           <Modal title={L.discTitle} closeLabel={L.discOk} dismissible={false}
-            onClose={() => setShowDisc(false)}>
+            onClose={closeDisc}>
             {L.disc.map((line, i) => (
               <div key={i} style={{
                 display: "flex", gap: 8, marginBottom: 9,
@@ -783,7 +817,25 @@ export default function FuelAdditiveCalculator() {
                 <span>{line}</span>
               </div>
             ))}
-            <div style={{ display: "flex", gap: 6, marginTop: 14 }}>
+            <button onClick={() => setDiscHide((v) => !v)} aria-pressed={discHide}
+              style={{
+                display: "flex", alignItems: "center", gap: 9, width: "100%",
+                marginTop: 14, padding: "11px 12px",
+                background: "transparent", border: `1px solid ${t.line}`,
+                borderRadius: t.radius, cursor: "pointer", textAlign: "left",
+              }}>
+              <span style={{
+                width: 18, height: 18, flexShrink: 0, borderRadius: 3,
+                border: `1.5px solid ${discHide ? t.add : t.dim}`,
+                background: discHide ? t.add : "transparent",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {discHide && <Check size={13} color="#fff" strokeWidth={3.5} />}
+              </span>
+              <span style={{ fontSize: 12.5, color: t.dim }}>{L.discHide}</span>
+            </button>
+
+            <div style={{ display: "flex", gap: 6, marginTop: 10 }}>
               {LANGS.map((l) => (
                 <button key={l} onClick={() => setLang(l)}
                   style={{
