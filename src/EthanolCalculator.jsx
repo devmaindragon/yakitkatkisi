@@ -242,6 +242,18 @@ const THEME = {
 export const VERSION =
   typeof __APP_VERSION__ !== "undefined" ? __APP_VERSION__ : "0.0.0";
 
+/* Cihaz dili tr/en/es ise onu kullan, değilse İngilizce */
+function detectLang() {
+  try {
+    const codes = navigator.languages?.length ? navigator.languages : [navigator.language];
+    for (const c of codes) {
+      const two = String(c || "").slice(0, 2).toLowerCase();
+      if (LANGS.includes(two)) return two;
+    }
+  } catch { /* yok say */ }
+  return "en";
+}
+
 const ThemeCtx = createContext(THEME);
 const useT = () => useContext(ThemeCtx);
 
@@ -455,7 +467,7 @@ export default function FuelAdditiveCalculator() {
   const [priorId, setPriorId] = useState("ethanol");
   const [priorVol, setPriorVol] = useState(2);
   const [priorRon, setPriorRon] = useState(110);
-  const [lang, setLang] = useState("tr");
+  const [lang, setLang] = useState(detectLang);
 
   const t = THEME;
   const L = STR[lang];
@@ -771,6 +783,20 @@ export default function FuelAdditiveCalculator() {
                 <span>{line}</span>
               </div>
             ))}
+            <div style={{ display: "flex", gap: 6, marginTop: 14 }}>
+              {LANGS.map((l) => (
+                <button key={l} onClick={() => setLang(l)}
+                  style={{
+                    flex: 1, cursor: "pointer", padding: "7px 0",
+                    fontSize: 11, fontWeight: 700, fontFamily: MONO,
+                    textTransform: "uppercase", letterSpacing: ".08em",
+                    borderRadius: t.radius,
+                    background: lang === l ? t.presetOn : t.presetBg,
+                    color: lang === l ? t.presetOnText : t.dim,
+                    border: `1px solid ${lang === l ? t.presetOn : t.line}`,
+                  }}>{l}</button>
+              ))}
+            </div>
           </Modal>
         )}
 
