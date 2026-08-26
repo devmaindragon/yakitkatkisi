@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Yakıt Katkısı — Etanol, toluen ve oktan hesabı</title>
+<meta name="description" content="Deponuza ne kadar etanol veya toluen ekleyeceğinizi saniyeler içinde hesaplayın. Karışımın tahmini oktanını da gösterir. Çevrimdışı çalışır, veri toplamaz." />
+<meta name="theme-color" content="#0b0e11" />
+<meta property="og:title" content="Yakıt Katkısı" />
+<meta property="og:description" content="Etanol, toluen ve oktan hesabı. Çevrimdışı çalışır, veri toplamaz." />
+<meta property="og:type" content="website" />
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0b0e11; --card: #151a1f; --line: #272f38;
+    --text: #f2f4f6; --dim: #7b8794; --red: #d0202c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 780px; margin: 0 auto; padding: 0 20px 90px; }
+
+  /* Hero */
+  .hero { text-align: center; padding: 70px 0 50px; }
+  .hero svg { width: 88px; height: 88px; border-radius: 20px; display: block; margin: 0 auto 22px; }
+  h1 { font-size: 40px; letter-spacing: -1px; margin: 0 0 8px; }
+  .tag { color: var(--dim); font-size: 18px; margin: 0 0 30px; }
+  .btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 13px 26px; border-radius: 6px;
+    font-size: 15px; font-weight: 700; text-decoration: none;
+    border: 1px solid var(--line); color: var(--text);
+  }
+  .btn.primary { background: var(--red); border-color: var(--red); color: #fff; }
+
+  h2 {
+    font-size: 13px; text-transform: uppercase; letter-spacing: .14em;
+    color: var(--red); margin: 60px 0 18px;
+  }
+  h3 { font-size: 18px; margin: 0 0 6px; }
+  p { color: #c8ced5; font-size: 16px; }
+
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 8px; padding: 20px;
+  }
+  .card p { font-size: 15px; margin: 0; color: var(--dim); }
+
+  ul { padding-left: 20px; }
+  li { color: #c8ced5; font-size: 16px; margin-bottom: 6px; }
+
+  .warn { border: 1px solid var(--red); border-radius: 8px; padding: 20px 22px; }
+  .warn p { color: var(--text); font-size: 15px; margin: 0; }
+
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .calc {
+    background: var(--card); border: 1px solid var(--line); border-radius: 6px;
+    padding: 14px 16px; font-size: 15px; color: var(--text); overflow-x: auto;
+  }
+
+  .alt { margin-top: 70px; border-top: 1px solid var(--line); padding-top: 40px; }
+  .alt h2 { margin-top: 34px; }
+  .alt p { font-size: 15px; color: var(--dim); }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 60px; padding-top: 26px;
+    text-align: center; color: var(--dim); font-size: 13px;
+  }
+  a { color: var(--red); }
+  footer a { color: var(--dim); }
+</style>
+</head>
+<body>
+<main>
+
+<div class="hero">
+  <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-label="Yakıt Katkısı">
+    <rect width="1024" height="1024" fill="#0b0e11"/>
+    <path d="M290 178 h444 a48 48 0 0 1 48 48 v572 a48 48 0 0 1 -48 48 h-444
+             a48 48 0 0 1 -48 -48 v-572 a48 48 0 0 1 48 -48 Z" fill="#f2f4f6"/>
+    <rect x="242" y="268" width="540" height="34" fill="#0b0e11"/>
+    <rect x="242" y="330" width="540" height="34" fill="#0b0e11"/>
+    <path d="M512 432 C 470 512 388 578 388 660 C 388 728 443 783 512 783
+             C 581 783 636 728 636 660 C 636 578 554 512 512 432 Z" fill="#d0202c"/>
+  </svg>
+
+  <h1>Yakıt Katkısı</h1>
+  <p class="tag">Etanol, toluen ve oktan hesabı</p>
+
+  <div class="btns">
+    <!-- Yayına girince: <a class="btn primary" href="https://apps.apple.com/app/idXXXXXXXXX">App Store'dan indir</a> -->
+    <a class="btn" href="support.html">Destek</a>
+    <a class="btn" href="privacy.html">Gizlilik</a>
+  </div>
+</div>
+
+<h2>Ne işe yarar</h2>
+<p>Deponuzdaki benzine etanol veya toluen eklerken gereken miktarı hesaplar. Elle formül
+çevirmekle uğraşmadan, birkaç saniyede doğru oranı bulursunuz. Karışımın tahmini oktanını
+da gösterir.</p>
+
+<h2>İki yönde çalışır</h2>
+<div class="grid">
+  <div class="card">
+    <h3>Miktara göre</h3>
+    <p>Elinizde 5 litre etanol var. Miktarı sürükleyin, oluşacak oranı ve oktanı anında görün.</p>
+  </div>
+  <div class="card">
+    <h3>Hedefe göre</h3>
+    <p>E30 karışım istiyorsunuz. Hedefi seçin, kaç litre eklemeniz gerektiğini söylesin.</p>
+  </div>
+</div>
+
+<h2>Karışım oktanı</h2>
+<p>Seçtiğiniz benzin oktanı, deponuzda hâlihazırda bulunan katkı oranı ve eklenecek maddenin
+oktanı birlikte hesaplanır:</p>
+<div class="calc mono">RON<sub>karışım</sub> = (V<sub>benzin</sub>·RON<sub>benzin</sub> + V<sub>katkı</sub>·RON<sub>katkı</sub>) / V<sub>toplam</sub></div>
+<p style="margin-top:14px">Hacimsel doğrusal karışım yöntemi. Gerçekte etanolün karışım
+oktanı doğrusal değildir ve düşük oranlarda beklenenden fazla katkı yapar — yani gerçek
+değer genelde bu tahminin biraz üzerindedir.</p>
+
+<h2>Özellikler</h2>
+<ul>
+  <li>Etanol (RON 109), toluen (RON 121) veya kendi oktanınızı girebileceğiniz özel katkı</li>
+  <li>Benzin oktanı seçimi: 93, 95, 98, 100</li>
+  <li>Depo hacmi listesi — aracınızı seçin, değer otomatik dolsun</li>
+  <li>Slider ile ayarlayın ya da rakama dokunup elle yazın</li>
+  <li>Karışımın neyden oluştuğunu gösteren görsel şerit</li>
+  <li>Türkçe, İngilizce, İspanyolca</li>
+  <li>Tamamen çevrimdışı — internet gerekmez</li>
+  <li>Hiçbir veri toplanmaz, hiçbir şey sunucuya gönderilmez</li>
+</ul>
+
+<h2>Güvenlik uyarısı</h2>
+<div class="warn">
+<p>Sonuçlar tahmindir, karıştırmadan önce kendiniz doğrulayın. Yakıta katkı eklemek aracınızın
+garantisini düşürebilir; emisyon ve yakıt mevzuatına aykırı olabilir, yerel kuralları kontrol
+edin. Toluen zehirlidir — buharını solumayın, cilde temas ettirmeyin, açık havada çalışın.
+Yüksek oranlar conta ve yakıt hortumlarına zarar verir. Yüksek etanol oranları uygun donanımı
+olmayan araçlarda yakıt sistemine zarar verebilir. Kullanım tamamen kendi sorumluluğunuzdadır.</p>
+</div>
+
+<div class="alt">
+
+<h2>English</h2>
+<p><strong>Fuel Additive</strong> works out how much ethanol or toluene to add to the gasoline
+in your tank. It runs both ways: give a target ratio and it tells you how many litres to add,
+or give an amount and it shows the resulting ratio. It also estimates the octane of the blend,
+taking into account the base gasoline octane, the additive already in the tank and the one you
+are adding. Ethanol (RON 109), toluene (RON 121) or a custom additive with your own octane
+value. Works fully offline and collects no data. Available in Turkish, English and Spanish.</p>
+<p><strong>Safety.</strong> Results are estimates — verify them before mixing. Blending
+additives may void your warranty and can breach emissions and fuel regulations. Toluene is
+toxic; do not inhale the vapour, avoid skin contact, work outdoors. High ratios damage seals
+and fuel lines. You use this app entirely at your own risk.</p>
+
+<h2>Español</h2>
+<p><strong>Aditivo de Combustible</strong> calcula cuánto etanol o tolueno hay que añadir a la
+gasolina del depósito. Funciona en ambos sentidos: indicas una proporción objetivo y te dice
+cuántos litros añadir, o indicas una cantidad y te muestra la proporción resultante. También
+estima el octanaje de la mezcla teniendo en cuenta la gasolina base, el aditivo que ya hay en
+el depósito y el que vas a añadir. Etanol (RON 109), tolueno (RON 121) o un aditivo
+personalizado con tu propio octanaje. Funciona sin conexión y no recopila datos. Disponible en
+turco, inglés y español.</p>
+<p><strong>Seguridad.</strong> Los resultados son estimaciones: verifícalos antes de mezclar.
+Añadir aditivos puede anular la garantía e incumplir la normativa de emisiones y combustibles.
+El tolueno es tóxico: no inhales el vapor, evita el contacto con la piel, trabaja al aire
+libre. En proporciones altas daña juntas y latiguillos. El uso es bajo tu entera
+responsabilidad.</p>
+
+</div>
+
+<footer>
+  dev.main.dragon ·
+  <a href="privacy.html">Gizlilik</a> ·
+  <a href="support.html">Destek</a> ·
+  <a href="mailto:dev.main.dragon@gmail.com">dev.main.dragon@gmail.com</a>
+</footer>
+
+</main>
+</body>
+</html>
