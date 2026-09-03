@@ -1508,7 +1508,12 @@ function InfoScreen() {
         }}>{L.infoTitle}</div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: T.gap }}>
+      <div style={{
+        display: "flex", flexDirection: "column", gap: T.gap,
+        maxHeight: "calc(100dvh - 330px)", minHeight: 240,
+        overflowY: "auto", WebkitOverflowScrolling: "touch",
+        paddingRight: 2,
+      }}>
         {L.info.map((item, i) => (
           <div key={i} style={{
             background: item.warn ? T.dangerBg : T.card,
@@ -1636,6 +1641,10 @@ export default function FuelAdditiveApp() {
     confirm, setConfirm,
   };
   ctx.L = { ...L, additiveLabel: A.name };
+
+  useEffect(() => {
+    try { window.scrollTo({ top: 0, behavior: "auto" }); } catch { /* yok say */ }
+  }, [screen]);
 
   const NAV = [
     ["calc", L.navCalc, Calculator],
