@@ -15,18 +15,21 @@
   main { max-width: 680px; margin: 0 auto; }
   h1 { font-size: 26px; letter-spacing: -0.5px; margin: 0 0 6px; }
   h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .1em;
-       color: #d0202c; margin: 34px 0 10px; }
-  h3 { font-size: 16px; margin: 22px 0 4px; color: #f2f4f6; }
+       color: #ee4a55; margin: 38px 0 10px; }
+  h3 { font-size: 16px; margin: 24px 0 4px; color: #f2f4f6; }
   p, li { color: #c8ced5; font-size: 15px; }
   ul { padding-left: 20px; }
   .date { color: #7b8794; font-size: 13px; margin: 0 0 30px; }
   .lang { color: #7b8794; font-size: 13px; margin-top: 50px;
           border-top: 1px solid #272f38; padding-top: 24px; }
-  a { color: #d0202c; }
-  .warn { border: 1px solid #d0202c; border-radius: 6px; padding: 14px 16px;
-          margin: 24px 0; }
+  a { color: #ee4a55; }
+  .warn { border: 1px solid #d0202c; border-radius: 6px; padding: 14px 16px; margin: 24px 0; }
   .warn p { color: #f2f4f6; margin: 0; font-size: 14px; }
   code { background: #151a1f; padding: 2px 6px; border-radius: 3px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #272f38; }
+  th { color: #7b8794; font-weight: 500; font-size: 13px;
+       text-transform: uppercase; letter-spacing: .08em; }
 </style>
 </head>
 <body>
@@ -41,71 +44,144 @@
 Genelde birkaç gün içinde yanıtlıyorum.</p>
 
 <h2>Uygulama Ne Yapıyor</h2>
-<p>Deponuzdaki yakıta etanol veya toluen eklerken gereken miktarı hesaplar. İki yönde
-çalışır: hedef bir oran verirsiniz, kaç litre eklemeniz gerektiğini söyler; ya da
-ekleyeceğiniz miktarı verirsiniz, oluşacak oranı gösterir. Ayrıca karışımın tahmini
-oktan değerini hesaplar.</p>
+<p>Dört bölümden oluşuyor:</p>
+<table>
+  <tr><th>Bölüm</th><th>İşlevi</th></tr>
+  <tr><td>Hesap</td><td>Deponuza ne kadar etanol veya toluen ekleyeceğinizi, karışımın oktanını ve maliyetini hesaplar</td></tr>
+  <tr><td>Garaj</td><td>Araçlarınızı ve yakıt fiyatlarınızı kaydeder</td></tr>
+  <tr><td>Kayıtlar</td><td>Hızlanma denemelerinizi kaydeder ve karşılaştırır</td></tr>
+  <tr><td>Bilgi</td><td>Yüksek oktanın neden güç kazandırdığını anlatır</td></tr>
+</table>
 
 <div class="warn">
 <p><strong>Güvenlik uyarısı.</strong> Sonuçlar tahmindir. Yakıta katkı eklemek garantiyi
 düşürebilir, emisyon ve yakıt mevzuatına aykırı olabilir. Toluen zehirlidir; buharını
 solumayın, cilde temas ettirmeyin, açık havada çalışın. Yüksek oranlar conta ve
-hortumlara zarar verir. Kullanım tamamen kendi sorumluluğunuzdadır.</p>
+hortumlara zarar verir. Hızlanma denemelerini yalnızca kapalı pistte veya trafiğe kapalı
+özel alanda yapın. Kullanım tamamen kendi sorumluluğunuzdadır.</p>
 </div>
 
-<h2>Sık Sorulanlar</h2>
+<h2>Hesap</h2>
+
+<h3>İki mod arasındaki fark ne?</h3>
+<p><strong>Miktara göre:</strong> Ekleyeceğiniz litreyi sürüklersiniz, oluşacak oranı ve
+oktanı gösterir. Elinizde belli miktarda katkı varken kullanışlıdır.<br>
+<strong>Hedefe göre:</strong> İstediğiniz oranı seçersiniz, kaç litre gerektiğini söyler.</p>
 
 <h3>Oktan hesabı ne kadar doğru?</h3>
-<p>Hacimsel doğrusal karışım formülü kullanılıyor: <code>(V₁·RON₁ + V₂·RON₂) / V_toplam</code>.
-Gerçekte etanolün karışım oktanı doğrusal değildir; düşük oranlarda beklenenden fazla
-katkı yapar. Yani gerçek değer genelde bu tahminin biraz üzerindedir. Uygulama içinde de
-bu not yer alır.</p>
+<p>Hacimsel doğrusal karışım formülü kullanılıyor:
+<code>(V₁·RON₁ + V₂·RON₂) / V_toplam</code>. Gerçekte etanolün karışım oktanı doğrusal
+değildir; düşük oranlarda beklenenden fazla katkı yapar. Yani gerçek değer genelde bu
+tahminin biraz üzerindedir. Uygulama içinde de bu not yer alır.</p>
 
 <h3>Seçtiğim oktan neyi ifade ediyor?</h3>
-<p>Depodaki yakıtın pompa değerini. İçindeki mevcut etanol o değere zaten dahildir, ayrıca
-hesaba katılmaz.</p>
+<p>Katkısız benzinin oktanını. Depodaki mevcut katkı oranı ayrıca hesaba katılır:
+depo oktanı <code>(1−oran)·RON_benzin + oran·RON_katkı</code> olarak bulunur, ekleme
+bunun üzerine yapılır.</p>
 
 <h3>Depodaki mevcut oranı nereden bileceğim?</h3>
 <p>Türkiye ve AB'de satılan kurşunsuz benzin genellikle %5–10 arası etanol içerir. Kesin
 değer için pompa etiketine bakın (E5, E10 gibi) veya bir etanol test kiti kullanın.</p>
 
-<h3>Aracımın deposu listede yok</h3>
-<p>Depodaki yakıt değerini elle de girebilirsiniz — sayının üzerine dokunup yazın. Listeye
-araç eklenmesini isterseniz e-posta atın.</p>
+<h3>Özel katkı seçeneği ne işe yarıyor?</h3>
+<p>Etanol ve toluen dışında bir madde kullanıyorsanız onun RON değerini elle girersiniz,
+hesap ona göre yapılır.</p>
+
+<h2>Garaj ve Maliyet</h2>
+
+<h3>Araç eklemek zorunda mıyım?</h3>
+<p>Hayır. Araç eklemeden de tüm hesaplar çalışır. Araç eklerseniz depo hacmi, mevcut oran
+ve benzin oktanı her seferinde otomatik dolar ve karışım depo kapasitesini aşarsa uyarı
+alırsınız.</p>
+
+<h3>"RON puanı başına maliyet" ne demek?</h3>
+<p>Kazandığınız her oktan puanının size kaça mal olduğu. Farklı katkıları kendi
+fiyatlarınızla karşılaştırmanın en doğru yolu budur — bir katkı litre başına daha pahalı
+olsa bile puan başına daha ucuz olabilir.</p>
+
+<h3>Fiyatları girmezsem ne olur?</h3>
+<p>Maliyet bölümü hiç görünmez, diğer her şey normal çalışır.</p>
+
+<h2>Denemeler</h2>
+
+<h3>Uygulamada kronometre var mı?</h3>
+<p>Hayır. Uygulama süre ölçmez. Başka bir yolla ölçtüğünüz süreleri kaydedersiniz.</p>
+
+<h3>Yol eğimini neden soruyor?</h3>
+<p>Eğim süreyi belirgin biçimde etkiler. Aynı araçta iki farklı karışımı karşılaştırırken
+ölçümlerin benzer eğimde alınmış olması gerekir, yoksa fark katkıdan değil yoldan
+kaynaklanır.</p>
+
+<h3>Süreler ne kadar güvenilir?</h3>
+<p>Tek turlar hava sıcaklığı, rakım, lastik sıcaklığı, yakıt seviyesi, rüzgâr ve sürücüye
+göre kolayca birkaç onda saniye oynar. Anlamlı bir karşılaştırma için aynı gün, aynı yol
+ve benzer koşullarda birkaç tur almanız gerekir. Bunlar bilimsel ölçüm değildir.</p>
+
+<h3>Referans sekmesindeki veriler kimin?</h3>
+<p>Bize ait ölçümlerdir, özel alanda alınmıştır. Her satırda araç, karışım ve yol eğimi
+yazılıdır.</p>
+
+<h2>Genel</h2>
 
 <h3>Veri kaydediliyor mu?</h3>
-<p>Hayır. Girdiğiniz hiçbir değer saklanmaz, hiçbir yere gönderilmez. Ayrıntı için
+<p>Araçlarınız, denemeleriniz, fiyatlarınız ve dil tercihiniz yalnızca cihazınızda
+saklanır. Hiçbiri sunucuya gönderilmez, kimseyle paylaşılmaz. Ayrıntı için
 <a href="privacy.html">gizlilik politikası</a>.</p>
+
+<h3>Uygulamayı silersem verilerim ne olur?</h3>
+<p>Silinir. Veriler yalnızca cihazda tutulduğu için yedeklenmez ve geri getirilemez.</p>
+
+<h3>Açılıştaki uyarıyı tekrar nasıl görürüm?</h3>
+<p>Ekranın en altındaki "Uyarı" bağlantısına dokunun.</p>
+
+<h3>Dil nasıl değişir?</h3>
+<p>Sağ üstteki dil düğmesine dokunun; TR, EN ve ES arasında sırayla geçer. İlk kurulumda
+cihazınızın dili otomatik seçilir.</p>
 
 <div class="lang">
 
 <h2>Support (English)</h2>
 <p>Contact: <a href="mailto:dev.main.dragon@gmail.com">dev.main.dragon@gmail.com</a></p>
-<p>The app calculates how much ethanol or toluene to add to the fuel in your tank. It works
-in both directions: give a target ratio and it tells you how many litres to add, or give an
-amount and it shows the resulting ratio. It also estimates the octane of the blend using a
-linear volumetric blend, which tends to read slightly low for ethanol at small ratios. The
-octane you select is the pump rating of the fuel already in your tank.</p>
+<p>The app has four sections. <strong>Calculate</strong> works out how much ethanol or
+toluene to add to the fuel in your tank, in both directions — give a target ratio and it
+tells you how many litres to add, or give an amount and it shows the resulting ratio. It
+also estimates the octane of the blend using a linear volumetric blend, which tends to read
+slightly low for ethanol at small ratios. The octane you select is that of the base
+gasoline; any additive already in the tank is accounted for separately. With fuel prices
+entered it also shows the cost per RON point gained. <strong>Garage</strong> stores your
+vehicles and prices. <strong>Records</strong> lets you log 0-100, 100-200 and 402 m times
+against the blend, road gradient and conditions, and compares them; a reference tab holds
+our own measurements. <strong>Info</strong> explains why high octane produces power.</p>
+<p>The app contains no timer and cannot measure speed — you enter times measured elsewhere.
+All data stays on your device and is lost if you delete the app. See the
+<a href="privacy.html">privacy policy</a>.</p>
 <p><strong>Safety.</strong> Results are estimates. Blending additives may void your warranty
 and can breach emissions and fuel regulations. Toluene is toxic — do not inhale the vapour,
-avoid skin contact, work outdoors. High ratios damage seals and hoses. You use this app
+avoid skin contact, work outdoors. High ratios damage seals and fuel lines. Only run
+acceleration tests on a closed track or private land closed to traffic. You use this app
 entirely at your own risk.</p>
-<p>No data is collected or stored. See the <a href="privacy.html">privacy policy</a>.</p>
 
 <h2>Soporte (Español)</h2>
 <p>Contacto: <a href="mailto:dev.main.dragon@gmail.com">dev.main.dragon@gmail.com</a></p>
-<p>La aplicación calcula cuánto etanol o tolueno añadir al combustible del depósito.
-Funciona en ambos sentidos: indicas una proporción objetivo y te dice cuántos litros
-añadir, o indicas una cantidad y te muestra la proporción resultante. También estima el
-octanaje de la mezcla mediante una mezcla lineal por volumen, que suele quedarse algo corta
-con el etanol en proporciones bajas. El octanaje que seleccionas es el valor de surtidor del
-combustible que ya está en el depósito.</p>
+<p>La aplicación tiene cuatro secciones. <strong>Calcular</strong> determina cuánto etanol o
+tolueno añadir al depósito, en ambos sentidos: indicas una proporción objetivo y te dice
+cuántos litros añadir, o indicas una cantidad y te muestra la proporción resultante. También
+estima el octanaje de la mezcla mediante una mezcla lineal por volumen, que suele quedarse
+algo corta con el etanol en proporciones bajas. El octanaje que eliges es el de la gasolina
+base; el aditivo que ya hay en el depósito se tiene en cuenta aparte. Con los precios
+introducidos, muestra además el coste por punto de RON ganado. <strong>Garaje</strong> guarda
+tus vehículos y precios. <strong>Registros</strong> permite anotar tiempos de 0-100, 100-200
+y 402 m junto a la mezcla, la pendiente y las condiciones, y los compara; una pestaña de
+referencia contiene nuestras propias mediciones. <strong>Info</strong> explica por qué el
+alto octanaje da potencia.</p>
+<p>La aplicación no tiene cronómetro ni mide velocidad: introduces tiempos medidos por otros
+medios. Todos los datos permanecen en tu dispositivo y se pierden si desinstalas la
+aplicación. Consulta la <a href="privacy.html">política de privacidad</a>.</p>
 <p><strong>Seguridad.</strong> Los resultados son estimaciones. Añadir aditivos puede anular
 la garantía e incumplir la normativa de emisiones y combustibles. El tolueno es tóxico: no
 inhales el vapor, evita el contacto con la piel, trabaja al aire libre. En proporciones altas
-daña juntas y latiguillos. El uso es bajo tu entera responsabilidad.</p>
-<p>No se recopila ni almacena ningún dato. Consulta la
-<a href="privacy.html">política de privacidad</a>.</p>
+daña juntas y latiguillos. Realiza las pruebas de aceleración solo en circuito cerrado o
+terreno privado cerrado al tráfico. El uso es bajo tu entera responsabilidad.</p>
 
 </div>
 </main>
